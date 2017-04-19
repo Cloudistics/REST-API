@@ -144,6 +144,10 @@ Returns json data about applications within an organization.
             "macAddress": "08:62:66:2b:88:b3"
           }
         ]
+      },
+      {
+        "uuid": "ff3e8565-7f7a-478f-bff2-7e32060d9078",
+        "type": "Node-Only"
       }
     ],
     "autoSnapshotPolicy": {
@@ -160,7 +164,24 @@ Returns json data about applications within an organization.
         "monthly": 60,
         "yearly": 10
       }
-    }
+    },
+    "bootOrder": [
+      {
+        "diskUuid": "ac8e01aa-a667-46cf-8a7a-7082c5c9a6f3",
+        "name": "Disk 0",
+        "order": 1
+      },
+      {
+        "vnicUuid": "3fdb865d-edc3-48c5-acc0-656f82c097e0",
+        "name": "vNIC 0",
+        "order": 2
+      },
+      {
+        "vnicUuid": "ff3e8565-7f7a-478f-bff2-7e32060d9078",
+        "name": "vNIC 1",
+        "order": 3
+      }
+    ]
   }
 ]
 ```
@@ -250,6 +271,10 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
           "macAddress": "08:62:66:2b:88:b3"
         }
       ]
+    },
+    {
+      "uuid": "ff3e8565-7f7a-478f-bff2-7e32060d9078",
+      "type": "Node-Only"
     }
   ],
   "autoSnapshotPolicy": {
@@ -266,7 +291,24 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
       "monthly": 60,
       "yearly": 10
     }
-  }
+  },
+  "bootOrder": [
+    {
+      "diskUuid": "ac8e01aa-a667-46cf-8a7a-7082c5c9a6f3",
+      "name": "Disk 0",
+      "order": 1
+    },
+    {
+      "vnicUuid": "3fdb865d-edc3-48c5-acc0-656f82c097e0",
+      "name": "vNIC 0",
+      "order": 2
+    },
+    {
+      "vnicUuid": "ff3e8565-7f7a-478f-bff2-7e32060d9078",
+      "name": "vNIC 1",
+      "order": 3
+    }
+  ]
 }
 ```
 
@@ -329,6 +371,7 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
   {
     "timestamp": "2017-01-11'T'12:00:00",
     "cpuUtilization": 50,
+    "vcpuUtilization" : 50,
     "memoryUtilization": 1073741824,
     "networkBandwidthReadsBytesPerSec": 0,
     "networkBandwidthWritesBytesPerSec": 0,
@@ -574,11 +617,59 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
       "uuid": "ac8e01aa-a667-46cf-8a7a-7082c5c9a6f3"
     }
   ],
-  "networks": [
+  "existingNetworks": [
     {
+      "vnicUuid": "7990c4d8-649a-4d2e-9767-a763a00721e7",
+      "name": "vNIC 0",
       "type": "Virtual Networking",
       "vnetUuid": "ff724194-931c-4c02-928e-e37821e74a8a",
       "firewallProfileUuid": "1f6aa5ea-3e65-4767-a08f-fb454aa26afd"
+    }
+  ],
+  "networksToRemove": [
+    {
+      "uuid": "749b33bc-107c-4213-93e8-7cc5e03a0da1"
+    }
+  ],
+  "networksToAdd": [
+    {
+      "name": "vNIC 1",
+      "type": "Bridged"
+    }
+  ],
+  "bootOrder": [
+    {
+      "name": "Disk 0",
+      "diskUuid": "fccbc37e-c53d-43d7-bb46-51e7dc629813",
+      "order": 1
+    },
+    {
+      "name": "Disk 1",
+      "diskUuid": "09fb5d94-f9e3-4f88-9c12-23c10f729500",
+      "order": 2
+    },
+    {
+      "name": "vNIC 0",
+      "vnicUuid": "7990c4d8-649a-4d2e-9767-a763a00721e7",
+      "order 3"
+    },
+    {
+      "name": "Disk 3",
+      "order": 4
+    },
+    {
+      "name": "Disk 4",
+      "order": 5
+    },
+    {
+      "name": "vNIC 1",
+      "order": 6
+    }
+  ],
+  "existingDisksToResize": [
+    {
+      "uuid": "fccbc37e-c53d-43d7-bb46-51e7dc629813",
+      "size": 107374182400
     }
   ]
 }
@@ -622,6 +713,24 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 
   * Optional fields in the request are "description", "addTags", "removeTags", "addDisks" and "removeDisks".
   * Networking "type" options are "Virtual Networking", "Node-Only" or "Bridged". If virtual networking is chosen, "vnetUuid" is required and "firewallProfileUuid" is optional.
+  * With multiple vNICs included in the existing networks, networks to add, and boot order, the name must start with "vNIC". For example, "vNIC 1".
+  * When adding a disk, the name provided must be the same used when including it in the boot order. The diskUuid property should not be set in the boot order for disks being added.
+  * When deleting a disk, only the uuid is required and the disk must not be included in the boot order.
+  * For existing disks that should be retained, they should be included in the boot order with the diskUuid property set.
+  * When adding a network (vNIC), the name provided must be the same used when including it in the boot order. The vnicUuid property should not be set in the boot order of networks being added.
+  * When deleting a network (vNIC), only the uuid is required and the network must not be included in the boot order.
+  * For existing networks (vNICs) that should be retained, they should be included in both the existing networks and the boot order with the name property set to the same value for both.
+  * The boot order should contain all disks and vNICs tied to the application:
+    * If an existing disk is included in both the boot order and the disks being removed, the request will fail.
+    * If a disk is added and not included in the boot order, the request will fail.
+    * If there is not at least one disk included in the boot order, the request will fail as at least one storage disk is required.
+    * If an existing network (vNIC) is included in both the boot order and the networks being removed, the request will fail.
+    * If a network (vNIC) is added and not included in the boot order, the request will fail.
+    * If there is not at least one network (vNIC) included in the boot order, the request will fail as at least one is required.
+  * When resizing an existing disk, the following failures can happen:
+    * If the application is not shutdown, the request will fail.
+    * If the new allocated size is less than the original allocated size for the existing disk, the request will fail.
+    * If the disk is being resized and is also included in the disks to remove, the request will fail.
   * The success response will return a status code of 200 if only the "name", "description", "datacenterUuid" and/or "migrationZoneUuid" were updated. If any of the other properties were updated the success response will be 202 Accepted.
 
 
@@ -660,9 +769,28 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
   "flashPoolUuid": "d80fe07d-5858-4de8-98ce-8a8b9b6684a4",
   "networks": [
     {
+      "name": "vNIC 0",
+      "vnicUuid": "bf6199ea-a94b-4768-b24d-8994bf9bdf88",
       "type": "Virtual Networking",
       "vnetUuid": "ff724194-931c-4c02-928e-e37821e74a8a",
       "firewallProfileUuid": "1f6aa5ea-3e65-4767-a08f-fb454aa26afd"
+    }
+  ],
+  "bootOrder": [
+    {
+      "diskUuid": "1b35fadb-7c63-46a6-9011-1df2a4f34918",
+      "name": "Disk 1",
+      "order" 1
+    },
+    {
+      "vnicUuid": "bf6199ea-a94b-4768-b24d-8994bf9bdf88",
+      "name": "vNIC 0",
+      "order": 2,
+    },
+    {
+      "diskUuid": "694c1484-ced4-4810-bcb3-a302ffb45f12",
+      "name": "Disk 2",
+      "order" 3
     }
   ]
 }
@@ -703,6 +831,13 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 
   * Optional fields in the request are "description" and "tags".
   * Networking "type" options are "Virtual Networking", "Node-Only" or "Bridged". If virtual networking is chosen, "vnetUuid" is required and "firewallProfileUuid" is optional.
+  * The boot order should contain all existing template disk files and networks (vNICs) tied to the template. The following are failures that can happen with relation to the boot order:
+    * If there is not at least one disk included in the boot order, the request will fail as at least one storage disk is required.
+    * If there is not at least one network (vNIC) included in the boot order, the request will fail as at least one network is required.
+    * If a template disk file tied to the template is not included in the boot order, the request will fail. The diskUuid property must be set to the uuid of the template disk file.
+    * If a network (vNIC) tied to the template is not included in the boot order, the request will fail. the vnicUuid property must be set to the uuid of the template vNIC.
+  * With multiple vNICs included in the networks and boot order, the name must start with "vNIC". For example, "vNIC 0". The name must be the same in both sections for a particular vNIC.
+  * Each template vNIC must be included in both the networks section and the boot order section.
 
 
 ### Start Application
@@ -2196,7 +2331,19 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
     "operatingSystem": {
       "type": "CentOS Linux",
       "version": "7"
-    }
+    },
+    "bootOrder": [
+      {
+        "diskUuid": "23bc2f5c-ac38-44fb-a96f-fdcd7dde25bf",
+        "name": "Disk 1",
+        "order": 1
+      },
+      {
+        "vnicUuid": "91d71039-42d3-4a2e-b9c1-cf6e01953eff",
+        "name": "vNIC 0",
+        "order": 2
+      }
+    ]
   }
 ]
 ```
@@ -2222,7 +2369,7 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 
 * **Notes:**
 
-  None
+  * The boot order section will include all template disk files and template vNICs tied to the template. When creating an application from template using the REST API, each of these template disk files and template vNICs must be included in the application's boot order.
 
 
 ### Get Template Information
@@ -2260,7 +2407,19 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
     "operatingSystem": {
       "type": "CentOS Linux",
       "version": "7"
-    }
+    },
+    "bootOrder": [
+      {
+        "diskUuid": "23bc2f5c-ac38-44fb-a96f-fdcd7dde25bf",
+        "name": "Disk 1",
+        "order": 1
+      },
+      {
+        "vnicUuid": "91d71039-42d3-4a2e-b9c1-cf6e01953eff",
+        "name": "vNIC 0",
+        "order": 2
+      }
+    ]
   }
 ```
 
@@ -2284,7 +2443,7 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 
 * **Notes:**
 
-  None
+  * The boot order section will include all template disk files and template vNICs tied to the template. When creating an application from template using the REST API, each of these template disk files and template vNICs must be included in the application's boot order.
 
 
 ### Get Action Information
