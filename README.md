@@ -35,7 +35,7 @@ CWS allows filtering of the responses through optional request parameters. Pleas
 
 ## Cloudistics Virtual Data Centers (VDC) API Reference 
 
-The Cloudistics Virtual Data Center (VDC) API Reference provides descriptions, syntax, and usage examples for each of the actions and data types for Cloudistics VDCs.
+The Cloudistics Virtual Data Center (VDC) API Reference provides descriptions, syntax, and usage examples for each of the actions and data types for Cloudistics VDCs.
 The topic for each action shows the Query API request parameters and the JSON response.
 
 ### Calls
@@ -712,7 +712,7 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 * **Notes:**
 
   * Optional fields in the request are "description", "addTags", "removeTags", "addDisks" and "removeDisks".
-  * Networking "type" options are "Virtual Networking", "Node-Only" or "Bridged". If virtual networking is chosen, "vnetUuid" is required and "firewallProfileUuid" is optional.
+  * Networking "type" options are "Virtual Networking", "Node-Only" or "Bridged". If virtual networking is chosen, "vnetUuid" is required and "firewallProfileUuid" is optional. If "Node-Only" or "Bridged" networking is chosen, "vnetUuid" and "firewallProfileUuid" cannot be included.
   * With multiple vNICs included in the existing networks, networks to add, and boot order, the name must start with "vNIC". For example, "vNIC 1".
   * When adding a disk, the name provided must be the same used when including it in the boot order. The diskUuid property should not be set in the boot order for disks being added.
   * When deleting a disk, only the uuid is required and the disk must not be included in the boot order.
@@ -830,7 +830,7 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 * **Notes:**
 
   * Optional fields in the request are "description" and "tags".
-  * Networking "type" options are "Virtual Networking", "Node-Only" or "Bridged". If virtual networking is chosen, "vnetUuid" is required and "firewallProfileUuid" is optional.
+  * Networking "type" options are "Virtual Networking", "Node-Only" or "Bridged". If virtual networking is chosen, "vnetUuid" is required and "firewallProfileUuid" is optional. If "Node-Only" or "Bridged" networking is chosen, "vnetUuid" and "firewallProfileUuid" cannot be included.
   * The boot order should contain all existing template disk files and networks (vNICs) tied to the template. The following are failures that can happen with relation to the boot order:
     * If there is not at least one disk included in the boot order, the request will fail as at least one storage disk is required.
     * If there is not at least one network (vNIC) included in the boot order, the request will fail as at least one network is required.
