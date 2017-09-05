@@ -129,7 +129,6 @@ Returns json data about applications within an organization.
         "uuid": "ac8e01aa-a667-46cf-8a7a-7082c5c9a6f3",
         "name": "Disk 0",
         "size": 1073741824,
-        "isBoot": true
       }
     ],
     "vnics": [
@@ -256,7 +255,6 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
       "uuid": "ac8e01aa-a667-46cf-8a7a-7082c5c9a6f3",
       "name": "Disk 0",
       "size": 1073741824,
-      "isBoot": true
     }
   ],
   "vnics": [
