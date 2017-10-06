@@ -135,18 +135,19 @@ Returns json data about applications within an organization.
       {
         "uuid": "3fdb865d-edc3-48c5-acc0-656f82c097e0",
         "type": "Virtual Networking",
+        "ipAddress": "127.0.0.1",
         "networks": [
           {
             "vnetUuid": "ff724194-931c-4c02-928e-e37821e74a8a",
             "firewallProfileUuid": "1f6aa5ea-3e65-4767-a08f-fb454aa26afd",
-            "ipAddress": "127.0.0.1",
             "macAddress": "08:62:66:2b:88:b3"
           }
         ]
       },
       {
         "uuid": "ff3e8565-7f7a-478f-bff2-7e32060d9078",
-        "type": "Node-Only"
+        "type": "Node-Only",
+        "ipAddress": "127.0.0.2"
       }
     ],
     "autoSnapshotPolicy": {
@@ -261,18 +262,19 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
     {
       "uuid": "3fdb865d-edc3-48c5-acc0-656f82c097e0",
       "type": "Virtual Networking",
+      "ipAddress": "127.0.0.1",
       "networks": [
         {
           "vnetUuid": "ff724194-931c-4c02-928e-e37821e74a8a",
           "firewallProfileUuid": "1f6aa5ea-3e65-4767-a08f-fb454aa26afd",
-          "ipAddress": "127.0.0.1",
           "macAddress": "08:62:66:2b:88:b3"
         }
       ]
     },
     {
       "uuid": "ff3e8565-7f7a-478f-bff2-7e32060d9078",
-      "type": "Node-Only"
+      "type": "Node-Only",
+      "ipAddress": "127.0.0.2"
     }
   ],
   "autoSnapshotPolicy": {
@@ -778,17 +780,17 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
     {
       "diskUuid": "1b35fadb-7c63-46a6-9011-1df2a4f34918",
       "name": "Disk 1",
-      "order" 1
+      "order": 1
     },
     {
       "vnicUuid": "bf6199ea-a94b-4768-b24d-8994bf9bdf88",
       "name": "vNIC 0",
-      "order": 2,
+      "order": 2
     },
     {
       "diskUuid": "694c1484-ced4-4810-bcb3-a302ffb45f12",
       "name": "Disk 2",
-      "order" 3
+      "order": 3
     }
   ]
 }
@@ -2341,7 +2343,8 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
         "name": "vNIC 0",
         "order": 2
       }
-    ]
+    ],
+    "vmMode": "Enhanced"
   }
 ]
 ```
@@ -2417,7 +2420,8 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
         "name": "vNIC 0",
         "order": 2
       }
-    ]
+    ],
+    "vmMode": "Enhanced"
   }
 ```
 
