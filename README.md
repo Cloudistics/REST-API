@@ -21,6 +21,24 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 
 Tokens can be found in your account under Settings > Developer Options.
 
+### Content type
+
+CWS requires content type in headers for PUT or POST REST API calls
+
+```bash
+curl -H "Authorization: Bearer [YOUR TOKEN]" \
+     -H "Content-Type: application/json" \
+     -X POST https://manage.cloudistics.com/api/latest/applications \
+     -d '{"name": "CentOS 7.5 Application", "description": "This application was created from a CentOS template.", "vcpus": 4, "memory": 1073741824, "templateUuid": "3625edfa-1d41-488c-bbdc-13d35bdeb9ae", "categoryUuid": "a55bb4da-7cad-40cb-95e0-37db93c7aa5e", "tags": [{"uuid": "3402698b-d436-4b70-8fe7-d44fae37c68a"}], "datacenterUuid": "101552a2-e436-415a-a1cd-a11e5cb1e06e", "migrationZoneUuid": "6c47337b-9ee0-434d-90a6-2743b1bcdf9a", "flashPoolUuid": "d80fe07d-5858-4de8-98ce-8a8b9b6684a4", "networks": [{"type": "VNET", "networkUuid": "ff724194-931c-4c02-928e-e37821e74a8a", "firewallOverrideUuid": "1f6aa5ea-3e65-4767-a08f-fb454aa26afd"}], "hardwareAssistedVirtualizationEnabled": true, "vmMode": "Enhanced", "applicationGroupUuid":"0ec8fee4-133b-46e5-b892-4ddd7ff62ab3"}'
+```
+
+```bash
+curl -H "Authorization: Bearer [YOUR TOKEN]" \
+     -H "Content-Type: application/json" \
+     -X PUT https://manage.cloudistics.com/api/latest/applications/[APPLICATION UUID]/name \
+     -d '{"name": "New Application name"}'
+```
+
 ### Filtering
 
 CWS allows filtering of the responses through optional request parameters. Please see the "URL Params" section within the definition of the REST API endpoint to see if filtering is available for it.
@@ -45,8 +63,7 @@ The topic for each action shows the Query API request parameters and the JSON re
 * [Get Application Information](#get-application-information)
 * [Get Application Statistics](#get-application-statistics)
 * [Get Application Disk Statistics](#get-application-disk-statistics)
-* [Get Firewall Profiles for Application](#get-firewall-profiles-for-application)
-* [Edit Application](#edit-application)
+* [Get Firewall Overrides for Application](#get-firewall-overrides-for-application)
 * [Create Application from Template](#create-application-from-template)
 * [Create Application from Snapshot](#create-application-from-snapshot)
 * [Start Application](#start-application)
@@ -67,7 +84,7 @@ The topic for each action shows the Query API request parameters and the JSON re
 * [Edit Application Compute Tags](#edit-application-compute-tags)
 * [Edit Application Compute Category](#edit-application-compute-category)
 * [Edit Application vNIC Name](#edit-application-vnic-name)
-* [Edit Application vNIC Networking Mode](#edit-application-vnic-type)
+* [Edit Application vNIC Networking Type](#edit-application-vnic-networking-type)
 * [Edit Application vNIC Firewall](#edit-application-vnic-firewall)
 * [Edit Application vNIC MAC Address](#edit-application-vnic-mac-address)
 * [Edit Application Disk Name](#edit-application-disk-name)
@@ -99,29 +116,46 @@ The topic for each action shows the Query API request parameters and the JSON re
 * [Get Virtual Datacenter Information](#get-virtual-datacenter-information)
 * [List all Migration Zones](#list-all-migration-zones)
 * [Get Migration Zone Information](#get-migration-zone-information)
-* [List all Vnets](#list-all-vnets)
-* [Get Vnet Information](#get-vnet-information)
-* [Get Firewall Profiles for Vnet](#get-firewall-profiles-for-vnet)
-* [Create Vnet](#create-vnet)
-* [Rename Vnet](#rename-vnet)
-* [Edit Vnet Properties](#edit-vnet-properties)
-* [Edit Vnet DHCP Service](#edit-vnet-dhcp-service)
-* [Edit Vnet Routing Service](#edit-vnet-routing-service)
-* [Edit Vnet Firewall Profile](#edit-vnet-firewall-profile)
-* [Deploy NFV Instance to Vnet](#deploy-nfv-instance-to-vnet)
-* [Remove NFV Instance from Vnet](#remove-nfv-instance-from-vnet)
-* [Link NFV Instance to Vnet](#link-nfv-instance-to-vnet)
-* [Unlink NFV Instance from Vnet](#unlink-nfv-instance-from-vnet)
-* [Delete Vnet](#delete-vnet)
+* [Get Migration Zone Statistics](#get-migration-zone-statistics)
+* [List all VLANs](#list-all-vlans)
+* [List all VNETs](#list-all-vnets)
+* [Get VNET Information](#get-vnet-information)
+* [Get Firewall Profile for VNET](#get-firewall-profile-for-vnet)
+* [Get VLAN Information](#get-vlan-information)
+* [Create VNET](#create-vnet)
+* [Create VLAN](#create-vlan)
+* [Rename Network](#rename-network)
+* [Edit VNET Properties](#edit-vnet-properties)
+* [Edit VNET DHCP Service](#edit-vnet-dhcp-service)
+* [Edit VNET Routing Service](#edit-vnet-routing-service)
+* [Edit VNET Firewall Profile](#edit-vnet-firewall-profile)
+* [Deploy NFV Instance to VNET](#deploy-nfv-instance-to-vnet)
+* [Remove NFV Instance from VNET](#remove-nfv-instance-from-vnet)
+* [Link NFV Instance to VNET](#link-nfv-instance-to-vnet)
+* [Unlink NFV Instance from VNET](#unlink-nfv-instance-from-vnet)
+* [Delete VNET](#delete-vnet)
+* [Delete VLAN](#delete-vlan)
 * [List all Flash Pools](#list-all-flash-pools)
 * [Get Flash Pool Information](#get-flash-pool-information)
+* [Get Flash Pool Statistics](#get-flash-pool-statistics)
 * [List all Templates](#list-all-templates)
 * [Get Template Information](#get-template-information)
 * [Create Template from Application](#create-template-from-application)
 * [Delete Template](#delete-template)
+* [Import VM to Template](#import-vm-to-template)
 * [Get Action Information](#get-action-information)
 * [Get Events](#get-events)
 * [Get Cloudistics Version](#get-version)
+* [List all Locations](#list-all-locations)
+* [Get Location Information](#get-location-information)
+* [List all Compute Nodes](#list-all-compute-nodes)
+* [Get Compute Node Information](#get-compute-node-information)
+* [Get Compute Node Statistics](#get-compute-node-statistics)
+* [List all Storage Blocks](#list-all-storage-blocks)
+* [Get Storage Block Information](#get-storage-block-information)
+* [List all Storage Controllers](#list-all-storage-controllers)
+* [Get Storage Controller Information](#get-storage-controller-information)
+* [List all Allocations](#list-all-allocations)
 
 ### List all Applications
 Returns json data about applications within an organization.
@@ -158,82 +192,7 @@ Returns json data about applications within an organization.
 [
   {
     "uuid": "e696855c-186f-4c2a-a381-1637195bef3f",
-    "name": "CentOS 7.5 Application",
-    "description": "This application was created from a CentOS template.",
-    "vcpus": 4,
-    "memory": 1073741824,
-    "categoryUuid": "a55bb4da-7cad-40cb-95e0-37db93c7aa5e",
-    "tags": [
-      {
-        "uuid": "fa527c37-3582-41e5-afcb-4b181b8e39aa"
-      }
-    ],
-    "datacenterUuid": "101552a2-e436-415a-a1cd-a11e5cb1e06e",
-    "migrationZoneUuid": "6c47337b-9ee0-434d-90a6-2743b1bcdf9a",
-    "flashPoolUuid": "0b9512cd-7e40-4fd8-a2c2-74189d6b57a3",
-    "status": "Running",
-    "networkServiceAppVnetUuid": "1d11b1cf-c2c6-4848-93cf-28b9e16f896d",
-    "disks": [
-      {
-        "uuid": "ac8e01aa-a667-46cf-8a7a-7082c5c9a6f3",
-        "name": "Disk 0",
-        "size": 1073741824
-      }
-    ],
-    "vnics": [
-      {
-        "uuid": "3fdb865d-edc3-48c5-acc0-656f82c097e0",
-        "type": "Virtual Networking",
-        "ipAddress": "127.0.0.1",
-        "networks": [
-          {
-            "vnetUuid": "ff724194-931c-4c02-928e-e37821e74a8a",
-            "firewallOverrideUuid": "1f6aa5ea-3e65-4767-a08f-fb454aa26afd",
-            "macAddress": "08:62:66:2b:88:b3"
-          }
-        ]
-      },
-      {
-        "uuid": "ff3e8565-7f7a-478f-bff2-7e32060d9078",
-        "type": "Node-Only",
-        "ipAddress": "127.0.0.2"
-      }
-    ],
-    "autoSnapshotPolicy": {
-      "localRetentionCount": 20,
-      "intervalInMinutes": 60
-    },
-    "disasterRecoveryPolicy": {
-      "isEnabled": true,
-      "destinationFlashPoolUuid": "71d97374-20e5-42bc-af61-8c916dd515a7",
-      "retentionCount": {
-        "all": 20,
-        "daily": 365,
-        "weekly": 104,
-        "monthly": 60,
-        "yearly": 10
-      }
-    },
-    "bootOrder": [
-      {
-        "diskUuid": "ac8e01aa-a667-46cf-8a7a-7082c5c9a6f3",
-        "name": "Disk 0",
-        "order": 1
-      },
-      {
-        "vnicUuid": "3fdb865d-edc3-48c5-acc0-656f82c097e0",
-        "name": "vNIC 0",
-        "order": 2
-      },
-      {
-        "vnicUuid": "ff3e8565-7f7a-478f-bff2-7e32060d9078",
-        "name": "vNIC 1",
-        "order": 3
-      }
-    ],
-    "hardwareAssistedVirtualizationEnabled": true,
-    "vmMode": "Enhanced",
-    "applicationGroupUuid":"079c633d-b934-478a-8246-9d7826668c16"
+    "name": "CentOS 7.5 Application"
   }
 ]
 ```
@@ -313,11 +272,12 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
   "vnics": [
     {
       "uuid": "3fdb865d-edc3-48c5-acc0-656f82c097e0",
-      "type": "Virtual Networking",
+      "type": "VNET",
       "ipAddress": "127.0.0.1",
       "networks": [
         {
-          "vnetUuid": "ff724194-931c-4c02-928e-e37821e74a8a",
+          "networkUuid": "ff724194-931c-4c02-928e-e37821e74a8a",
+          "networkName": "Custom Vnet",
           "firewallOverrideUuid": "1f6aa5ea-3e65-4767-a08f-fb454aa26afd",
           "macAddress": "08:62:66:2b:88:b3"
         }
@@ -325,8 +285,15 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
     },
     {
       "uuid": "ff3e8565-7f7a-478f-bff2-7e32060d9078",
-      "type": "Node-Only",
-      "ipAddress": "127.0.0.2"
+      "type": "VLAN",
+      "ipAddress": "127.0.0.2",
+      "networks": [
+        {
+          "networkUuid": "c61386a5-431b-49d6-adb7-d33663f539ff",
+          "firewallOverrideUuid": "1f6aa5ea-3e65-4767-a08f-fb454aa26afd",
+          "macAddress": "09:79:12:2b:8e:y3"
+        }
+      ]
     }
   ],
   "autoSnapshotPolicy": {
@@ -348,17 +315,20 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
     {
       "diskUuid": "ac8e01aa-a667-46cf-8a7a-7082c5c9a6f3",
       "name": "Disk 0",
-      "order": 1
+      "order": 1,
+      "vnicUuid": null
     },
     {
       "vnicUuid": "3fdb865d-edc3-48c5-acc0-656f82c097e0",
       "name": "vNIC 0",
-      "order": 2
+      "order": 2,
+      "diskUuid": null
     },
     {
       "vnicUuid": "ff3e8565-7f7a-478f-bff2-7e32060d9078",
       "name": "vNIC 1",
-      "order": 3
+      "order": 3,
+      "diskUuid": null
     }
   ],
   "hardwareAssistedVirtualizationEnabled": true,
@@ -542,12 +512,12 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
   None
 
 
-### Get Firewall Profiles for Application
-  Returns json data about firewall profiles for an application.
+### Get Firewall Overrides for Application
+  Returns json data about firewall overrides for an application.
 
 * **URL**
 
-  `/api/latest/applications/[APPLICATION UUID]/firewall-profiles`
+  `/api/latest/applications/[APPLICATION UUID]/firewall-overrides`
 
 * **Method:**
 
@@ -612,181 +582,13 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 
 ```bash
 curl -H "Authorization: Bearer [YOUR TOKEN]" \
-     -G https://manage.cloudistics.com/api/latest/applications/[APPLICATION UUID]/firewall-profiles \
+     -G https://manage.cloudistics.com/api/latest/applications/[APPLICATION UUID]/firewall-overrides \
      -d 'limit-count=10'
 ```
 
 * **Notes:**
 
   None
-
-
-### Edit Application
-  Updates properties for an application and returns json data about the action.
-
-* **URL**
-
-  `/api/latest/applications/[APPLICATION UUID]`
-
-* **Method:**
-
-  `PUT`
-
-*  **URL Params**
-
-   None
-
-* **Data Params**
-
-```json
-{
-  "name": "CentOS 7.5 Application",
-  "description": "This application was created from a CentOS template.",
-  "vcpus": 4,
-  "memory": 1073741824,
-  "categoryUuid": "a55bb4da-7cad-40cb-95e0-37db93c7aa5e",
-  "addTags": [
-    {
-      "uuid": "3402698b-d436-4b70-8fe7-d44fae37c68a"
-    }
-  ],
-  "removeTags": [
-    {
-      "uuid": "fa527c37-3582-41e5-afcb-4b181b8e39aa"
-    }
-  ],
-  "datacenterUuid": "101552a2-e436-415a-a1cd-a11e5cb1e06e",
-  "migrationZoneUuid": "6c47337b-9ee0-434d-90a6-2743b1bcdf9a",
-  "addDisks": [
-    {
-      "name": "Disk 3",
-      "size": 1073741824
-    },
-    {
-      "name": "Disk 4",
-      "size": 1073741824
-    }
-  ],
-  "removeDisks": [
-    {
-      "uuid": "ac8e01aa-a667-46cf-8a7a-7082c5c9a6f3"
-    }
-  ],
-  "existingNetworks": [
-    {
-      "vnicUuid": "7990c4d8-649a-4d2e-9767-a763a00721e7",
-      "name": "vNIC 0",
-      "type": "Virtual Networking",
-      "vnetUuid": "ff724194-931c-4c02-928e-e37821e74a8a",
-      "firewallOverrideUuid": "1f6aa5ea-3e65-4767-a08f-fb454aa26afd"
-    }
-  ],
-  "networksToRemove": [
-    {
-      "uuid": "749b33bc-107c-4213-93e8-7cc5e03a0da1"
-    }
-  ],
-  "networksToAdd": [
-    {
-      "name": "vNIC 1",
-      "type": "Bridged"
-    }
-  ],
-  "bootOrder": [
-    {
-      "name": "Disk 0",
-      "diskUuid": "fccbc37e-c53d-43d7-bb46-51e7dc629813",
-      "order": 1
-    },
-    {
-      "name": "Disk 1",
-      "diskUuid": "09fb5d94-f9e3-4f88-9c12-23c10f729500",
-      "order": 2
-    },
-    {
-      "name": "vNIC 0",
-      "vnicUuid": "7990c4d8-649a-4d2e-9767-a763a00721e7",
-      "order 3"
-    },
-    {
-      "name": "Disk 3",
-      "order": 4
-    },
-    {
-      "name": "Disk 4",
-      "order": 5
-    },
-    {
-      "name": "vNIC 1",
-      "order": 6
-    }
-  ],
-  "existingDisksToResize": [
-    {
-      "uuid": "fccbc37e-c53d-43d7-bb46-51e7dc629813",
-      "size": 107374182400
-    }
-  ]
-}
-```
-
-* **Success Response:**
-
-  * **Code:** 200 OK<br />
-    **Content:** `Application successfully updated.`
-
-  * **Code:** 202 Accepted <br />
-    **Content:** `{"actionUuid": "71011d4e-a4f7-4ab1-95e0-9e8986fb3f2c"}`
-
-* **Error Response:**
-
-  * **Code:** 400 Bad Request <br />
-    **Content:** `{"code":"Bad Request: Invalid request data","message":"field: [name] error: [required field is empty or not provided]","fieldErrors":null}`
-
-  * **Code:** 403 Forbidden <br />
-    **Content:** `{"code":"Access Denied","message":"Unable to access REST API. Invalid token.","fieldErrors":null}`
-
-  * **Code:** 404 Not Found <br />
-    **Content:** `{"code":"Resource Not Found","message":"Application with uuid e696855c-186f-4c2a-a381-1637195bef3f does not exist.","fieldErrors":null}`
-
-  * **Code:** 429 Too Many Requests <br />
-    **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
-
-  * **Code:** 500 Internal Server Error <br />
-    **Content:** `{"code":"Invalid Request","message":"Error editing application instance. You cannot modify the datacenter if the application is running.","fieldErrors":null}`
-
-* **Sample Call:**
-
-```bash
-curl -H "Authorization: Bearer [YOUR TOKEN]" \
-     -H "Content-Type: application/json" \
-     -X PUT https://manage.cloudistics.com/api/latest/applications/[APPLICATION UUID] \
-     -d '{"name": "CentOS 7.5 Application", "description": "This application was created from a CentOS template.", "vcpus": 4, "memory": 1073741824, "categoryUuid": "a55bb4da-7cad-40cb-95e0-37db93c7aa5e", "addTags": [{"uuid": "3402698b-d436-4b70-8fe7-d44fae37c68a"}], "removeTags": [{ "uuid": "fa527c37-3582-41e5-afcb-4b181b8e39aa"}], "datacenterUuid": "101552a2-e436-415a-a1cd-a11e5cb1e06e", "migrationZoneUuid": "6c47337b-9ee0-434d-90a6-2743b1bcdf9a", "addDisks": [{"name": "Disk 3", "size": 1073741824}, {"name": "Disk 4", "size": 1073741824}], "removeDisks": [{"uuid": "ac8e01aa-a667-46cf-8a7a-7082c5c9a6f3"}], "networks": [{"type": "Virtual Networking", "vnetUuid": "ff724194-931c-4c02-928e-e37821e74a8a", "firewallOverrideUuid": "1f6aa5ea-3e65-4767-a08f-fb454aa26afd"}]}'
-```
-
-* **Notes:**
-
-  * Optional fields in the request are "description", "addTags", "removeTags", "addDisks" and "removeDisks".
-  * Networking "type" options are "Virtual Networking", "Node-Only" or "Bridged". If virtual networking is chosen, "vnetUuid" is required and "firewallOverrideUuid" is optional. If "Node-Only" or "Bridged" networking is chosen, "vnetUuid" and "firewallOverrideUuid" cannot be included.
-  * With multiple vNICs included in the existing networks, networks to add, and boot order, the name must start with "vNIC". For example, "vNIC 1".
-  * When adding a disk, the name provided must be the same used when including it in the boot order. The diskUuid property should not be set in the boot order for disks being added.
-  * When deleting a disk, only the uuid is required and the disk must not be included in the boot order.
-  * For existing disks that should be retained, they should be included in the boot order with the diskUuid property set.
-  * When adding a network (vNIC), the name provided must be the same used when including it in the boot order. The vnicUuid property should not be set in the boot order of networks being added.
-  * When deleting a network (vNIC), only the uuid is required and the network must not be included in the boot order.
-  * For existing networks (vNICs) that should be retained, they should be included in both the existing networks and the boot order with the name property set to the same value for both.
-  * The boot order should contain all disks and vNICs tied to the application:
-    * If an existing disk is included in both the boot order and the disks being removed, the request will fail.
-    * If a disk is added and not included in the boot order, the request will fail.
-    * If there is not at least one disk included in the boot order, the request will fail as at least one storage disk is required.
-    * If an existing network (vNIC) is included in both the boot order and the networks being removed, the request will fail.
-    * If a network (vNIC) is added and not included in the boot order, the request will fail.
-    * If there is not at least one network (vNIC) included in the boot order, the request will fail as at least one is required.
-  * When resizing an existing disk, the following failures can happen:
-    * If the application is not shutdown, the request will fail.
-    * If the new allocated size is less than the original allocated size for the existing disk, the request will fail.
-    * If the disk is being resized and is also included in the disks to remove, the request will fail.
-  * The success response will return a status code of 200 if only the "name", "description", "datacenterUuid" and/or "migrationZoneUuid" were updated. If any of the other properties were updated the success response will be 202 Accepted.
 
 
 ### Create Application from Template
@@ -826,8 +628,8 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
     {
       "name": "vNIC 0",
       "vnicUuid": "bf6199ea-a94b-4768-b24d-8994bf9bdf88",
-      "type": "Virtual Networking",
-      "vnetUuid": "ff724194-931c-4c02-928e-e37821e74a8a",
+      "type": "VNET",
+      "networkUuid": "ff724194-931c-4c02-928e-e37821e74a8a",
       "firewallOverrideUuid": "1f6aa5ea-3e65-4767-a08f-fb454aa26afd",
       "automaticMACAssignment": false,
       "macAddress": "ab:ab:ab:ab:ab:ab"
@@ -878,11 +680,11 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
   * **Code:** 404 Not Found <br />
     **Content:** `{"code":"Resource Not Found","message":"Template with uuid 3625edfa-1d41-488c-bbdc-13d35bdeb9ae does not exist.","fieldErrors":null}`
 
+  * **Code:** 422 Unprocessable Entity <br />
+    **Content:** `{"code":"Invalid Request","message":"Error creating application instance from template. There does not exist a valid hypervisor that can fit this application instance.","fieldErrors":null}`
+
   * **Code:** 429 Too Many Requests <br />
     **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
-
-  * **Code:** 500 Internal Server Error <br />
-    **Content:** `{"code":"Invalid Request","message":"Error creating application instance from template. There does not exist a valid hypervisor that can fit this application instance.","fieldErrors":null}`
 
 * **Sample Call:**
 
@@ -890,13 +692,13 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 curl -H "Authorization: Bearer [YOUR TOKEN]" \
      -H "Content-Type: application/json" \
      -X POST https://manage.cloudistics.com/api/latest/applications \
-     -d '{"name": "CentOS 7.5 Application", "description": "This application was created from a CentOS template.", "vcpus": 4, "memory": 1073741824, "templateUuid": "3625edfa-1d41-488c-bbdc-13d35bdeb9ae", "categoryUuid": "a55bb4da-7cad-40cb-95e0-37db93c7aa5e", "tags": [{"uuid": "3402698b-d436-4b70-8fe7-d44fae37c68a"}], "datacenterUuid": "101552a2-e436-415a-a1cd-a11e5cb1e06e", "migrationZoneUuid": "6c47337b-9ee0-434d-90a6-2743b1bcdf9a", "flashPoolUuid": "d80fe07d-5858-4de8-98ce-8a8b9b6684a4", "networks": [{"type": "Virtual Networking", "vnetUuid": "ff724194-931c-4c02-928e-e37821e74a8a", "firewallOverrideUuid": "1f6aa5ea-3e65-4767-a08f-fb454aa26afd"}], "hardwareAssistedVirtualizationEnabled": true, "vmMode": "Enhanced", "applicationGroupUuid":"0ec8fee4-133b-46e5-b892-4ddd7ff62ab3"}'
+     -d '{"name":"CentOS 7.5 Application","description":"This application was created from a CentOS template.","vcpus":4,"memory":1073741824,"templateUuid":"3625edfa-1d41-488c-bbdc-13d35bdeb9ae","categoryUuid":"a55bb4da-7cad-40cb-95e0-37db93c7aa5e","tags":[{"uuid":"3402698b-d436-4b70-8fe7-d44fae37c68a"}],"datacenterUuid":"101552a2-e436-415a-a1cd-a11e5cb1e06e","migrationZoneUuid":"6c47337b-9ee0-434d-90a6-2743b1bcdf9a","flashPoolUuid":"d80fe07d-5858-4de8-98ce-8a8b9b6684a4","networks":[{"name":"vNIC 0","vnicUuid":"bf6199ea-a94b-4768-b24d-8994bf9bdf88","type":"VNET","networkUuid":"ff724194-931c-4c02-928e-e37821e74a8a","firewallOverrideUuid":"1f6aa5ea-3e65-4767-a08f-fb454aa26afd","automaticMACAssignment":false,"macAddress":"ab:ab:ab:ab:ab:ab"}],"bootOrder":[{"diskUuid":"1b35fadb-7c63-46a6-9011-1df2a4f34918","name":"Disk 1","order":1},{"vnicUuid":"bf6199ea-a94b-4768-b24d-8994bf9bdf88","name":"vNIC 0","order":2},{"diskUuid":"694c1484-ced4-4810-bcb3-a302ffb45f12","name":"Disk 2","order":3}],"hardwareAssistedVirtualizationEnabled":true,"vmMode":"Enhanced","applicationGroupUuid":"0ec8fee4-133b-46e5-b892-4ddd7ff62ab3"}'
 ```
 
 * **Notes:**
 
   * Optional fields in the request are "description" and "tags".
-  * Networking "type" options are "Virtual Networking", "Node-Only" or "Bridged". If virtual networking is chosen, "vnetUuid" is required and "firewallOverrideUuid" is optional. If "Node-Only" or "Bridged" networking is chosen, "vnetUuid" and "firewallOverrideUuid" cannot be included.
+  * Networking "type" options are "VNET" or "VLAN". For both types, "networkUuid" is required and "firewallOverrideUuid" is optional. If "VLAN" networking is chosen, "firewallOverrideUuid" cannot be included.
   * The boot order should contain all existing template disk files and networks (vNICs) tied to the template. The following are failures that can happen with relation to the boot order:
     * If there is not at least one disk included in the boot order, the request will fail as at least one storage disk is required.
     * If there is not at least one network (vNIC) included in the boot order, the request will fail as at least one network is required.
@@ -944,8 +746,8 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
     {
       "name": "vNIC 0",
       "vnicUuid": "bf6199ea-a94b-4768-b24d-8994bf9bdf88",
-      "type": "Virtual Networking",
-      "vnetUuid": "ff724194-931c-4c02-928e-e37821e74a8a",
+      "type": "VNET",
+      "networkUuid": "ff724194-931c-4c02-928e-e37821e74a8a",
       "firewallOverrideUuid": "1f6aa5ea-3e65-4767-a08f-fb454aa26afd",
       "automaticMACAssignment": false,
       "macAddress": "ab:ab:ab:ab:ab:ab"
@@ -996,11 +798,11 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
   * **Code:** 404 Not Found <br />
     **Content:** `{"code":"Resource Not Found","message":"Snapshot with uuid 3625edfa-1d41-488c-bbdc-13d35bdeb9ae does not exist for application with uuid 36a371c5-a9aa-4f4f-b1d1-ed782a11bc6a.","fieldErrors":null}`
 
+  * **Code:** 422 Unprocessable Entity <br />
+    **Content:** `{"code":"Invalid Request","message":"Error creating application instance from snapshot. There does not exist a valid hypervisor that can fit this application instance.","fieldErrors":null}`
+
   * **Code:** 429 Too Many Requests <br />
     **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
-
-  * **Code:** 500 Internal Server Error <br />
-    **Content:** `{"code":"Invalid Request","message":"Error creating application instance from snapshot. There does not exist a valid hypervisor that can fit this application instance.","fieldErrors":null}`
 
 * **Sample Call:**
 
@@ -1008,13 +810,13 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 curl -H "Authorization: Bearer [YOUR TOKEN]" \
      -H "Content-Type: application/json" \
      -X POST https://manage.cloudistics.com/api/latest/applications/create-from-snapshot \
-     -d '{"name": "CentOS 7.5 Application Snapshot", "description": "This application was created from a CentOS 7.5 Application snapshot.", "vcpus": 4, "memory": 1073741824, "snapshotUuid": "3625edfa-1d41-488c-bbdc-13d35bdeb9ae", "categoryUuid": "a55bb4da-7cad-40cb-95e0-37db93c7aa5e", "tags": [{"uuid": "3402698b-d436-4b70-8fe7-d44fae37c68a"}], "datacenterUuid": "101552a2-e436-415a-a1cd-a11e5cb1e06e", "migrationZoneUuid": "6c47337b-9ee0-434d-90a6-2743b1bcdf9a", "flashPoolUuid": "d80fe07d-5858-4de8-98ce-8a8b9b6684a4", "networks": [{"type": "Virtual Networking", "vnetUuid": "ff724194-931c-4c02-928e-e37821e74a8a", "firewallOverrideUuid": "1f6aa5ea-3e65-4767-a08f-fb454aa26afd"}], "hardwareAssistedVirtualizationEnabled": true, "vmMode": "Enhanced", "applicationGroupUuid":"0ec8fee4-133b-46e5-b892-4ddd7ff62ab3"}'
+     -d '{"name":"CentOS 7.5 Application Snapshot","description":"This application was created from a CentOS 7.5 Application snapshot.","vcpus":4,"memory":1073741824,"snapshotUuid":"3625edfa-1d41-488c-bbdc-13d35bdeb9ae","categoryUuid":"a55bb4da-7cad-40cb-95e0-37db93c7aa5e","tags":[{"uuid":"3402698b-d436-4b70-8fe7-d44fae37c68a"}],"datacenterUuid":"101552a2-e436-415a-a1cd-a11e5cb1e06e","migrationZoneUuid":"6c47337b-9ee0-434d-90a6-2743b1bcdf9a","flashPoolUuid":"d80fe07d-5858-4de8-98ce-8a8b9b6684a4","networks":[{"name":"vNIC 0","vnicUuid":"bf6199ea-a94b-4768-b24d-8994bf9bdf88","type":"VNET","networkUuid":"ff724194-931c-4c02-928e-e37821e74a8a","firewallOverrideUuid":"1f6aa5ea-3e65-4767-a08f-fb454aa26afd","automaticMACAssignment":false,"macAddress":"ab:ab:ab:ab:ab:ab"}],"bootOrder":[{"diskUuid":"1b35fadb-7c63-46a6-9011-1df2a4f34918","name":"Disk 1","order":1},{"vnicUuid":"bf6199ea-a94b-4768-b24d-8994bf9bdf88","name":"vNIC 0","order":2},{"diskUuid":"694c1484-ced4-4810-bcb3-a302ffb45f12","name":"Disk 2","order":3}],"hardwareAssistedVirtualizationEnabled":true,"vmMode":"Enhanced","applicationGroupUuid":"0ec8fee4-133b-46e5-b892-4ddd7ff62ab3"}'
 ```
 
 * **Notes:**
 
   * Optional fields in the request are "description" and "tags".
-  * Networking "type" options are "Virtual Networking", "Node-Only" or "Bridged". If virtual networking is chosen, "vnetUuid" is required and "firewallOverrideUuid" is optional. If "Node-Only" or "Bridged" networking is chosen, "vnetUuid" and "firewallOverrideUuid" cannot be included.
+  * Networking "type" options are "VNET" or "VLAN". For both types, "networkUuid" is required and "firewallOverrideUuid" is optional. If "VLAN" networking is chosen, "firewallOverrideUuid" cannot be included.
   * The boot order should contain all existing disks and networks (vNICs) tied to the application of the snapshot. The following are failures that can happen with relation to the boot order:
     * If there is not at least one disk included in the boot order, the request will fail as at least one storage disk is required.
     * If there is not at least one network (vNIC) included in the boot order, the request will fail as at least one network is required.
@@ -1063,11 +865,11 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
   * **Code:** 404 Not Found <br />
     **Content:** `{"code":"Resource Not Found","message":"Application with uuid e696855c-186f-4c2a-a381-1637195bef3f does not exist.","fieldErrors":null}`
 
+  * **Code:** 422 Unprocessable Entity <br />
+    **Content:** `{"code":"Invalid Request","message":"Unable to start application that is already running.","fieldErrors":null}`
+
   * **Code:** 429 Too Many Requests <br />
     **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
-
-  * **Code:** 500 Internal Server Error <br />
-    **Content:** `{"code":"Invalid Request","message":"Unable to start application that is already running.","fieldErrors":null}`
 
 * **Sample Call:**
 
@@ -1119,11 +921,11 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
   * **Code:** 404 Not Found <br />
     **Content:** `{"code":"Resource Not Found","message":"Application with uuid e696855c-186f-4c2a-a381-1637195bef3f does not exist.","fieldErrors":null}`
 
+  * **Code:** 422 Unprocessable Entity <br />
+    **Content:** `{"code":"Invalid Request","message":"Unable to stop application that is shut off.","fieldErrors":null}`
+
   * **Code:** 429 Too Many Requests <br />
     **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
-
-  * **Code:** 500 Internal Server Error <br />
-    **Content:** `{"code":"Invalid Request","message":"Unable to stop application that is shut off.","fieldErrors":null}`
 
 * **Sample Call:**
 
@@ -1175,11 +977,11 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
   * **Code:** 404 Not Found <br />
     **Content:** `{"code":"Resource Not Found","message":"Application with uuid e696855c-186f-4c2a-a381-1637195bef3f does not exist.","fieldErrors":null}`
 
+  * **Code:** 422 Unprocessable Entity <br />
+    **Content:** `{"code":"Invalid Request","message":"Unable to restart application that is not running.","fieldErrors":null}`
+
   * **Code:** 429 Too Many Requests <br />
     **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
-
-  * **Code:** 500 Internal Server Error <br />
-    **Content:** `{"code":"Invalid Request","message":"Unable to restart application that is not running.","fieldErrors":null}`
 
 * **Sample Call:**
 
@@ -1231,11 +1033,11 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
   * **Code:** 404 Not Found <br />
     **Content:** `{"code":"Resource Not Found","message":"Application with uuid e696855c-186f-4c2a-a381-1637195bef3f does not exist.","fieldErrors":null}`
 
+  * **Code:** 422 Unprocessable Entity <br />
+    **Content:** `{"code":"Invalid Request","message":"Unable to pause application that is not running.","fieldErrors":null}`
+
   * **Code:** 429 Too Many Requests <br />
     **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
-
-  * **Code:** 500 Internal Server Error <br />
-    **Content:** `{"code":"Invalid Request","message":"Unable to pause application that is not running.","fieldErrors":null}`
 
 * **Sample Call:**
 
@@ -1287,11 +1089,11 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
   * **Code:** 404 Not Found <br />
     **Content:** `{"code":"Resource Not Found","message":"Application with uuid e696855c-186f-4c2a-a381-1637195bef3f does not exist.","fieldErrors":null}`
 
+  * **Code:** 422 Unprocessable Entity <br />
+    **Content:** `{"code":"Invalid Request","message":"Unable to resume application that is not paused.","fieldErrors":null}`
+
   * **Code:** 429 Too Many Requests <br />
     **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
-
-  * **Code:** 500 Internal Server Error <br />
-    **Content:** `{"code":"Invalid Request","message":"Unable to resume application that is not paused.","fieldErrors":null}`
 
 * **Sample Call:**
 
@@ -1351,11 +1153,11 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
   * **Code:** 404 Not Found <br />
     **Content:** `{"code":"Resource Not Found","message":"Application with uuid e696855c-186f-4c2a-a381-1637195bef3f does not exist.","fieldErrors":null}`
 
+  * **Code:** 422 Unprocessable Entity <br />
+    **Content:** `{"code":"Invalid Request","message":"Unable to delete application that is a networking services application.","fieldErrors":null}`
+
   * **Code:** 429 Too Many Requests <br />
     **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
-
-  * **Code:** 500 Internal Server Error <br />
-    **Content:** `{"code":"Invalid Request","message":"Unable to delete application that is a networking services application.","fieldErrors":null}`
 
 * **Sample Call:**
 
@@ -1408,11 +1210,11 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
   * **Code:** 404 Not Found <br />
     **Content:** `{"code":"Resource Not Found","message":"Application with uuid e696855c-186f-4c2a-a381-1637195bef3f does not exist.","fieldErrors":null}`
 
+  * **Code:** 422 Unprocessable Entity <br />
+    **Content:** `{"code":"Invalid Request","message":"Unable to shutdown application that is running and unreachable.","fieldErrors":null}`
+
   * **Code:** 429 Too Many Requests <br />
     **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
-
-  * **Code:** 500 Internal Server Error <br />
-    **Content:** `{"code":"Invalid Request","message":"Unable to shutdown application that is running and unreachable.","fieldErrors":null}`
 
 * **Sample Call:**
 
@@ -1466,16 +1268,17 @@ curl -H "Authorization: Bearer [YOUR TOEKN]" \
   * **Code:** 404 Not Found <br />
     **Content:** `{"code":"Resource Not Found","message":"Application with uuid e696855c-186f-4c2a-a381-1637195bef3f does not exist.","fieldErrors":null}`
 
+  * **Code:** 422 Unprocessable Entity <br />
+    **Content:** `{"code":"Invalid Request","message":"An application with name New Application Name already exists for this organization.","fieldErrors":null}`
+
   * **Code:** 429 Too Many Requests <br />
     **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
-
-  * **Code:** 500 Internal Server Error <br />
-    **Content:** `{"code":"Invalid Request","message":"An application with name New Application Name already exists for this organization.","fieldErrors":null}`
 
 * **Sample Call:**
 
 ```bash
 curl -H "Authorization: Bearer [YOUR TOKEN]" \
+     -H "Content-Type: application/json" \
      -X PUT https://manage.cloudistics.com/api/latest/applications/[APPLICATION UUID]/name \
      -d '{"name": "New Application name"}'
 ```
@@ -1529,11 +1332,11 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
   * **Code:** 404 Not Found <br />
     **Content:** `{"code":"Resource Not Found","message":"Application with uuid e696855c-186f-4c2a-a381-1637195bef3f does not exist.","fieldErrors":null}`
 
+  * **Code:** 422 Unprocessable Entity <br />
+    **Content:** `{"code":"Invalid Request","message":"Error cloning and attaching disk to application instance. The application is not eligible to have this disk cloned and attached.","fieldErrors":null}`
+
   * **Code:** 429 Too Many Requests <br />
     **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
-
-  * **Code:** 500 Internal Server Error <br />
-    **Content:** `{"code":"Invalid Request","message":"Error cloning and attaching disk to application instance. The application is not eligible to have this disk cloned and attached.","fieldErrors":null}`
 
 * **Sample Call:**
 
@@ -1606,6 +1409,7 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 
 ```bash
 curl -H "Authorization: Bearer [YOUR TOKEN]" \
+     -H "Content-Type: application/json" \
      -X PUT https://manage.cloudistics.com/api/latest/applications/[APPLICATION UUID]/description \
      -d '{"description": "New Application description"}'
 ```
@@ -1655,17 +1459,17 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
   * **Code:** 404 Not Found <br />
     **Content:** `{"code":"Resource Not Found","message":"Application with uuid e696855c-186f-4c2a-a381-1637195bef3f does not exist.","fieldErrors":null}`
 
-  * **Code:** 429 Too Many Requests <br />
-    **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
-
-  * **Code:** 500 Internal Server Error <br />
+  * **Code:** 422 Unprocessable Entity <br />
     **Content:** `{"code":"Invalid Request","message":"Unable to update application instance datacenter. Application must be shut off to complete this action.","fieldErrors":null}`
 
+  * **Code:** 429 Too Many Requests <br />
+    **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
 
 * **Sample Call:**
 
 ```bash
 curl -H "Authorization: Bearer [YOUR TOKEN]" \
+     -H "Content-Type: application/json" \
      -X PUT https://manage.cloudistics.com/api/latest/applications/[APPLICATION UUID]/datacenter \
      -d '{"datacenterUuid": "20209870-b4f0-11e7-abc4-cec278b6b50a"}'
 ```
@@ -1716,16 +1520,17 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
   * **Code:** 404 Not Found <br />
     **Content:** `{"code":"Resource Not Found","message":"Application with uuid e696855c-186f-4c2a-a381-1637195bef3f does not exist.","fieldErrors":null}`
 
+  * **Code:** 422 Unprocessable Entity <br />
+    **Content:** `{"code":"Invalid Request","message":"Unable to update application instance migration zone. Application must be shut off to complete this action.","fieldErrors":null}`
+
   * **Code:** 429 Too Many Requests <br />
     **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
-
-  * **Code:** 500 Internal Server Error <br />
-    **Content:** `{"code":"Invalid Request","message":"Unable to update application instance migration zone. Application must be shut off to complete this action.","fieldErrors":null}`
 
 * **Sample Call:**
 
 ```bash
 curl -H "Authorization: Bearer [YOUR TOKEN]" \
+     -H "Content-Type: application/json" \
      -X PUT https://manage.cloudistics.com/api/latest/applications/[APPLICATION UUID]/migration-zone \
      -d '{"migrationZoneUuid": "20209870-b4f0-11e7-abc4-cec278b6b50a"}'
 ```
@@ -1788,17 +1593,17 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
   * **Code:** 404 Not Found <br />
     **Content:** `{"code":"Invalid Request","message":"This application disk with uuid ff678e0a-ae9f-11e7-abc4-cec278b6b50a does not exist in our database. Please try again.","fieldErrors":null}`
 
-  * **Code:** 429 Too Many Requests <br />
-    **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
-
-  * **Code:** 500 Internal Server Error <br />
+  * **Code:** 422 Unprocessable Entity <br />
     **Content:** `{"code":"Invalid Request","message":"Unable to update application instance's boot order. Original boot order list does not match the new list provided.","fieldErrors":null}`
 
+  * **Code:** 429 Too Many Requests <br />
+    **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
 
 * **Sample Call:**
 
 ```bash
 curl -H "Authorization: Bearer [YOUR TOKEN]" \
+     -H "Content-Type: application/json" \
      -X PUT https://manage.cloudistics.com/api/latest/applications/[APPLICATION UUID]/boot-order \
      -d '{"bootOrder" : [{"diskUuid" : "ff678e0a-ae9f-11e7-abc4-cec278b6b50a", "order" : 1}, {"diskUuid" : "20209f46-b4f0-11e7-abc4-cec278b6b50a", "order" : 2}, {"vnicUuid" : "20209ae6-b4f0-11e7-abc4-	cec278b6b50a", "order" : 3}]}'
 ```
@@ -1858,17 +1663,17 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
   * **Code:** 404 Not Found <br />
     **Content:** `{"code":"Resource Not Found","message":"Application with uuid e696855c-186f-4c2a-a381-1637195bef3f does not exist.","fieldErrors":null}`
 
-  * **Code:** 429 Too Many Requests <br />
-    **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
-
-  * **Code:** 500 Internal Server Error <br />
+  * **Code:** 422 Unprocessable Entity <br />
     **Content:** `{"code":"Invalid Request","message":"Unable to update application instance vCPU provisioning. Application must be shut off to decrease this value.","fieldErrors":null}`
 
+  * **Code:** 429 Too Many Requests <br />
+    **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
 
 * **Sample Call:**
 
 ```bash
 curl -H "Authorization: Bearer [YOUR TOKEN]" \
+     -H "Content-Type: application/json" \
      -X PUT https://manage.cloudistics.com/api/latest/applications/[APPLICATION UUID]/vcpus \
      -d '{"vcpus": 16}'
 ```
@@ -1927,17 +1732,17 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
   * **Code:** 404 Not Found <br />
     **Content:** `{"code":"Resource Not Found","message":"Application with uuid e696855c-186f-4c2a-a381-1637195bef3f does not exist.","fieldErrors":null}`
 
-  * **Code:** 429 Too Many Requests <br />
-    **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
-
-  * **Code:** 500 Internal Server Error <br />
+  * **Code:** 422 Unprocessable Entity <br />
     **Content:** `{"code":"Invalid Request","message":"Unable to update application instance's resource profile. Memory DIMM size must be a multiple of 128 MB.","fieldErrors":null}`
 
+  * **Code:** 429 Too Many Requests <br />
+    **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
 
 * **Sample Call:**
 
 ```bash
 curl -H "Authorization: Bearer [YOUR TOKEN]" \
+     -H "Content-Type: application/json" \
      -X PUT https://manage.cloudistics.com/api/latest/applications/[APPLICATION UUID]/memory \
      -d '{"memory": 14858392}'
 ```
@@ -1965,12 +1770,16 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 
 ```json
 {
-  "addTags" : [
-    "uuid" : "6ef0a804-b505-11e7-abc4-cec278b6b50a"
-  ],
-  "removeTags" : [
-    "uuid" : "2020a02c-b4f0-11e7-abc4-cec278b6b50a"
-  ]
+   "addTags":[
+      {
+         "uuid":"6ef0a804-b505-11e7-abc4-cec278b6b50a"
+      }
+   ],
+   "removeTags":[
+      {
+         "uuid":"2020a02c-b4f0-11e7-abc4-cec278b6b50a"
+      }
+   ]
 }
 ```
 
@@ -2001,19 +1810,19 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
   * **Code:** 404 Not Found <br />
     **Content:** `{"code":"Resource Not Found","message":"Application with uuid e696855c-186f-4c2a-a381-1637195bef3f does not exist.","fieldErrors":null}`
 
-  * **Code:** 429 Too Many Requests <br />
-    **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
-
-  * **Code:** 500 Internal Server Error <br />
+  * **Code:** 422 Unprocessable Entity <br />
     **Content:** `{"code":"Invalid Request","message":"Error removing compute tags from application. Tag with uuid 2020a02c-b4f0-11e7-abc4-cec278b6b50a is not assigned to this application.","fieldErrors":null}`
 
+  * **Code:** 429 Too Many Requests <br />
+    **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
 
 * **Sample Call:**
 
 ```bash
 curl -H "Authorization: Bearer [YOUR TOKEN]" \
+     -H "Content-Type: application/json" \
      -X PUT https://manage.cloudistics.com/api/latest/applications/[APPLICATION UUID]/compute-tags \
-     -d '{"addTags": ["uuid" : "6ef0a804-b505-11e7-abc4-cec278b6b50a"], "removeTags": ["uuid" : "2020a02c-b4f0-11e7-abc4-cec278b6b50a"]}'
+     -d '{"addTags": [{"uuid" : "6ef0a804-b505-11e7-abc4-cec278b6b50a"}], "removeTags": [{"uuid" : "2020a02c-b4f0-11e7-abc4-cec278b6b50a"}]}'
 ```
 
 * **Notes:**
@@ -2087,6 +1896,7 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 
 ```bash
 curl -H "Authorization: Bearer [YOUR TOKEN]" \
+     -H "Content-Type: application/json" \
      -X PUT https://manage.cloudistics.com/api/latest/applications/[APPLICATION UUID]/compute-category \
      -d '{"categoryUuid": "ff678e0a-ae9f-11e7-abc4-cec278b6b50a"}'
 ```
@@ -2101,7 +1911,7 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 
 * **URL**
 
-  `/api/latest/applications/[APPLICATION UUID]/vnic-name`
+  `/api/latest/applications/[APPLICATION UUID]/vnics/[VNIC_UUID]/name`
 
 * **Method:**
 
@@ -2115,7 +1925,6 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 
 ```json
 {
-  "vnicUuid" : "ff678e0a-ae9f-11e7-abc4-cec278b6b50a",
   "name" : "New vNIC Name"
 }
 ```
@@ -2138,30 +1947,31 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
   * **Code:** 404 Not Found <br />
     **Content:** `{"code":"Resource Not Found","message":"Application with uuid e696855c-186f-4c2a-a381-1637195bef3f does not exist.","fieldErrors":null}`
 
+  * **Code:** 422 Unprocessable Entity <br />
+    **Content:** `{"code":"Invalid Request","message":"An application vnic with name Br0 already exists for this organization.","fieldErrors":null}`
+
   * **Code:** 429 Too Many Requests <br />
     **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
-
-  * **Code:** 500 Internal Server Error <br />
-    **Content:** `{"code":"Invalid Request","message":"An application vnic with name Br0 already exists for this organization.","fieldErrors":null}`
 
 * **Sample Call:**
 
 ```bash
 curl -H "Authorization: Bearer [YOUR TOKEN]" \
-     -X PUT https://manage.cloudistics.com/api/latest/applications/[APPLICATION UUID]/vnic-name \
-     -d '{"vnicUuid": "ff678e0a-ae9f-11e7-abc4-cec278b6b50a", "name" : "New vNIC Name"}'
+     -H "Content-Type: application/json" \
+     -X PUT https://manage.cloudistics.com/api/latest/applications/[APPLICATION UUID]/vnics/[VNIC_UUID]/name \
+     -d '{"name" : "New vNIC Name"}'
 ```
 
 * **Notes:**
 
   None
 
-### Edit Application vNIC Networking Mode
+### Edit Application vNIC Networking Type
   Updates an application vNIC's networking
 
 * **URL**
 
-  `/api/latest/applications/[APPLICATION UUID]/vnic-type`
+  `/api/latest/applications/[APPLICATION UUID]/vnics/[VNIC_UUID]/type`
 
 * **Method:**
 
@@ -2177,18 +1987,16 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 
 ```json
 {
-  "vnicUuid" : "ff678e0a-ae9f-11e7-abc4-cec278b6b50a",
-  "type" : "Bridged"
+  "type" : "VLAN"
 }
 ```
 
-  * Change to virtual networking (vnetUUID required): 
+  * Change to VNET (networkUUID required): 
 
 ```json
 {
-  "vnicUuid" : "ff678e0a-ae9f-11e7-abc4-cec278b6b50a",
-  "type" : "Virtual Networking",
-  "vnetUuid" : "d0c8f53e-b5a2-11e7-abc4-cec278b6b50a"
+  "type" : "VNET",
+  "networkUuid" : "d0c8f53e-b5a2-11e7-abc4-cec278b6b50a"
 }
 ```
 
@@ -2218,13 +2026,14 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 
 ```bash
 curl -H "Authorization: Bearer [YOUR TOKEN]" \
-     -X PUT https://manage.cloudistics.com/api/latest/applications/[APPLICATION UUID]/vnic-type \
-     -d '{"vnicUuid": "ff678e0a-ae9f-11e7-abc4-cec278b6b50a", "type" : "Bridged"}'
+     -H "Content-Type: application/json" \
+     -X PUT https://manage.cloudistics.com/api/latest/applications/[APPLICATION UUID]/vnics/[VNIC_UUID]/type \
+     -d '{"type" : "VLAN"}'
 ```
 
 * **Notes:**
 
-  * When switching to virtual networking, a vnetUuid must be provided otherwise this request will fail
+  * When switching to networking mode, a networkUuid must be provided otherwise this request will fail
 
 
 ### Edit Application vNIC Firewall
@@ -2232,7 +2041,7 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 
 * **URL**
 
-  `/api/latest/applications/[APPLICATION UUID]/vnic-firewall`
+  `/api/latest/applications/[APPLICATION UUID]/vnics/[VNIC_UUID]/firewall`
 
 * **Method:**
 
@@ -2247,7 +2056,6 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 
 ```json
 {
-  "vnicUuid" : "ff678e0a-ae9f-11e7-abc4-cec278b6b50a",
   "firewallOverrideUuid" : "ff678e0a-ae9f-11e7-abc4-cec278b6b50a"
 }
 ```
@@ -2288,8 +2096,9 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 
 ```bash
 curl -H "Authorization: Bearer [YOUR TOKEN]" \
-     -X PUT https://manage.cloudistics.com/api/latest/applications/[APPLICATION UUID]/vnic-firewall \
-     -d '{"vnicUuid": "ff678e0a-ae9f-11e7-abc4-cec278b6b50a", "firewallOverrideUuid" : "ff678e0a-ae9f-11e7-abc4-cec278b6b50a"}'
+     -H "Content-Type: application/json" \
+     -X PUT https://manage.cloudistics.com/api/latest/applications/[APPLICATION UUID]/vnics/[VNIC_UUID]/firewall \
+     -d '{"firewallOverrideUuid" : "ff678e0a-ae9f-11e7-abc4-cec278b6b50a"}'
 ```
 
 * **Notes:**
@@ -2302,7 +2111,7 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 
 * **URL**
 
-  `/api/latest/applications/[APPLICATION UUID]/vnic-mac-address`
+  `/api/latest/applications/[APPLICATION UUID]/vnics/[VNIC_UUID]/mac-address`
 
 * **Method:**
 
@@ -2318,7 +2127,6 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 
 ```json
 {
-  "vnicUuid" : "ff678e0a-ae9f-11e7-abc4-cec278b6b50a",
   "macAddress" : "ab:ab:ab:ab:ab:ab",
   "automaticMACAssignment" : false
 }
@@ -2328,7 +2136,6 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 
 ```json
 {
-  "vnicUuid" : "ff678e0a-ae9f-11e7-abc4-cec278b6b50a",
   "macAddress" : "",
   "automaticMACAssignment" : true
 }
@@ -2360,8 +2167,9 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 
 ```bash
 curl -H "Authorization: Bearer [YOUR TOKEN]" \
-     -X PUT https://manage.cloudistics.com/api/latest/applications/[APPLICATION UUID]/vnic-mac-address \
-     -d '{"vnicUuid": "ff678e0a-ae9f-11e7-abc4-cec278b6b50a", "macAddress" : "ab:ab:ab:ab:ab:ab", "automaticMACAssignment" : false}'
+     -H "Content-Type: application/json" \
+     -X PUT https://manage.cloudistics.com/api/latest/applications/[APPLICATION UUID]/vnics/[VNIC_UUID]/mac-address \
+     -d '{"macAddress" : "ab:ab:ab:ab:ab:ab", "automaticMACAssignment" : false}'
 ```
 
 * **Notes:**
@@ -2374,7 +2182,7 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 
 * **URL**
 
-  `/api/latest/applications/[APPLICATION UUID]/disk-name`
+  `/api/latest/applications/[APPLICATION UUID]/disks/[DISK_UUID]/name`
 
 * **Method:**
 
@@ -2388,7 +2196,6 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 
 ```json
 {
-  "uuid" : "d0c8f7be-b5a2-11e7-abc4-cec278b6b50a",
   "name" : "Alpha disk"
 }
 ```
@@ -2411,18 +2218,19 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
   * **Code:** 404 Not Found <br />
     **Content:** `{"code":"Resource Not Found","message":"Application with uuid e696855c-186f-4c2a-a381-1637195bef3f does not exist.","fieldErrors":null}`
 
+  * **Code:** 422 Unprocessable Entity <br />
+    **Content:** `{"code":"Invalid Request","message":"An application disk with name Alpha disk already exists for this organization.","fieldErrors":null}`
+
   * **Code:** 429 Too Many Requests <br />
     **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
-
-  * **Code:** 500 Internal Server Error <br />
-    **Content:** `{"code":"Invalid Request","message":"An application disk with name Alpha disk already exists for this organization.","fieldErrors":null}`
 
 * **Sample Call:**
 
 ```bash
 curl -H "Authorization: Bearer [YOUR TOKEN]" \
-     -X PUT https://manage.cloudistics.com/api/latest/applications/[APPLICATION UUID]/disk-name \
-     -d '{"uuid": "d0c8f7be-b5a2-11e7-abc4-cec278b6b50a", "name" : "Alpha disk"}'
+     -H "Content-Type: application/json" \
+     -X PUT https://manage.cloudistics.com/api/latest/applications/[APPLICATION UUID]/disks/[DISK_UUID]/name \
+     -d '{"name" : "Alpha disk"}'
 ```
 
 * **Notes:**
@@ -2435,7 +2243,7 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 
 * **URL**
 
-  `/api/latest/applications/[APPLICATION UUID]/disk-size`
+  `/api/latest/applications/[APPLICATION UUID]/disks/[DISK_UUID]/size`
 
 * **Method:**
 
@@ -2449,7 +2257,6 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 
 ```json
 {
-  "uuid" : "d0c8f8d6-b5a2-11e7-abc4-cec278b6b50a",
   "size" : 32423438
 }
 ```
@@ -2473,18 +2280,19 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
   * **Code:** 404 Not Found <br />
     **Content:** `{"code":"Resource Not Found","message":"Application with uuid e696855c-186f-4c2a-a381-1637195bef3f does not exist.","fieldErrors":null}`
 
+  * **Code:** 422 Unprocessable Entity <br />
+    **Content:** `{"code":"Invalid Request","message":"Error resizing disk with UUID: d0c8f8d6-b5a2-11e7-abc4-cec278b6b50a. You may not decrease the size of an existing disk.","fieldErrors":null}`
+
   * **Code:** 429 Too Many Requests <br />
     **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
-
-  * **Code:** 500 Internal Server Error <br />
-    **Content:** `{"code":"Invalid Request","message":"Error resizing disk with UUID: d0c8f8d6-b5a2-11e7-abc4-cec278b6b50a. You may not decrease the size of an existing disk.","fieldErrors":null}`
 
 * **Sample Call:**
 
 ```bash
 curl -H "Authorization: Bearer [YOUR TOKEN]" \
-     -X PUT https://manage.cloudistics.com/api/latest/applications/[APPLICATION UUID]/disk-size \
-     -d '{"uuid": "d0c8f8d6-b5a2-11e7-abc4-cec278b6b50a", "size" : 32423438}'
+     -H "Content-Type: application/json" \
+     -X PUT https://manage.cloudistics.com/api/latest/applications/[APPLICATION UUID]/disks/[DISK_UUID]/size \
+     -d '{"size" : 32423438}'
 ```
 
 * **Notes:**
@@ -2496,7 +2304,7 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 
 * **URL**
 
-  `/api/latest/applications/[APPLICATION UUID]/disk`
+  `/api/latest/applications/[APPLICATION UUID]/disks`
 
 * **Method:**
 
@@ -2534,17 +2342,18 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
   * **Code:** 404 Not Found <br />
     **Content:** `{"code":"Resource Not Found","message":"Application with uuid e696855c-186f-4c2a-a381-1637195bef3f does not exist.","fieldErrors":null}`
 
+  * **Code:** 422 Unprocessable Entity <br />
+    **Content:** `{"code":"Invalid Request","message":"Error adding disk to application. You cannot add a disk to an application in compatibility mode that is not shut off.","fieldErrors":null}`
+
   * **Code:** 429 Too Many Requests <br />
     **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
-
-  * **Code:** 500 Internal Server Error <br />
-    **Content:** `{"code":"Invalid Request","message":"Error adding disk to application. You cannot add a disk to an application in compatibility mode that is not shut off.","fieldErrors":null}`
 
 * **Sample Call:**
 
 ```bash
 curl -H "Authorization: Bearer [YOUR TOKEN]" \
-     -X POST https://manage.cloudistics.com/api/latest/applications/[APPLICATION UUID]/disk \
+     -H "Content-Type: application/json" \
+     -X POST https://manage.cloudistics.com/api/latest/applications/[APPLICATION UUID]/disks \
      -d '{"name": "Disk 2", "size" : 32423438}'
 ```
 
@@ -2558,7 +2367,7 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 
 * **URL**
 
-  `/api/latest/applications/[APPLICATION UUID]/vnic`
+  `/api/latest/applications/[APPLICATION UUID]/vnics`
 
 * **Method:**
 
@@ -2575,7 +2384,7 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 ```json
 {
   "name" : "vNIC 2",
-  "type" : "Bridged",
+  "type" : "VLAN",
   "macAddress" : "ab:ab:ab:ab:ab:ab",
   "automaticMACAssignment" : false
 }
@@ -2586,8 +2395,8 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 ```json
 {
   "name" : "vNIC 2",
-  "type" : "Virtual Networking",
-  "vnetUuid" : "d0c8f9c6-b5a2-11e7-abc4-cec278b6b50a",
+  "type" : "VNET",
+  "networkUuid" : "d0c8f9c6-b5a2-11e7-abc4-cec278b6b50a",
   "firewallOverrideUuid" : "d0c8fcdc-b5a2-11e7-abc4-cec278b6b50a",
   "macAddress" : "",
   "automaticMACAssignment" : true
@@ -2613,18 +2422,19 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
   * **Code:** 404 Not Found <br />
     **Content:** `{"code":"Resource Not Found","message":"Application with uuid e696855c-186f-4c2a-a381-1637195bef3f does not exist.","fieldErrors":null}`
 
+  * **Code:** 422 Unprocessable Entity <br />
+    **Content:** `{"code":"Invalid Request","message":"Error adding vNIC to application. There is a maximim of 64 vNICs for an application. Please update and try again.","fieldErrors":null}`
+
   * **Code:** 429 Too Many Requests <br />
     **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
-
-  * **Code:** 500 Internal Server Error <br />
-    **Content:** `{"code":"Invalid Request","message":"Error adding vNIC to application. There is a maximim of 64 vNICs for an application. Please update and try again.","fieldErrors":null}`
 
 * **Sample Call:**
 
 ```bash
 curl -H "Authorization: Bearer [YOUR TOKEN]" \
-     -X POST https://manage.cloudistics.com/api/latest/applications/[APPLICATION UUID]/vnic \
-     -d '{"name": "vNIC 2", "type" : "Virtual Networking", "vnetUuid" : "d0c8f9c6-b5a2-11e7-abc4-cec278b6b50a", "firewallOverrideUuid" : "d0c8fcdc-b5a2-11e7-abc4-cec278b6b50a", "macAddress" : "", "automaticMACAssignment" : true}'
+     -H "Content-Type: application/json" \
+     -X POST https://manage.cloudistics.com/api/latest/applications/[APPLICATION UUID]/vnics \
+     -d '{"name": "vNIC 2", "type" : "VNET", "networkUuid" : "d0c8f9c6-b5a2-11e7-abc4-cec278b6b50a", "firewallOverrideUuid" : "d0c8fcdc-b5a2-11e7-abc4-cec278b6b50a", "macAddress" : "", "automaticMACAssignment" : true}'
 ```
 
 * **Notes:**
@@ -2636,7 +2446,7 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 
 * **URL**
 
-  `/api/latest/applications/[APPLICATION UUID]/vnic`
+  `/api/latest/applications/[APPLICATION UUID]/vnics/[VNIC_UUID]`
 
 * **Method:**
 
@@ -2648,11 +2458,7 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 
 * **Data Params**
 
-```json
-{
-  "uuid" : "d0c8fdea-b5a2-11e7-abc4-cec278b6b50a",
-}
-```
+   None
 
 * **Success Response:**
 
@@ -2672,18 +2478,18 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
   * **Code:** 404 Not Found <br />
     **Content:** `{"code":"Resource Not Found","message":"Application with uuid e696855c-186f-4c2a-a381-1637195bef3f does not exist.","fieldErrors":null}`
 
+  * **Code:** 422 Unprocessable Entity <br />
+    **Content:** `{"code":"Invalid Request","message":"Unable to update application instance networking. Application must be shut off to complete this action.","fieldErrors":null}`
+
   * **Code:** 429 Too Many Requests <br />
     **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
-
-  * **Code:** 500 Internal Server Error <br />
-    **Content:** `{"code":"Invalid Request","message":"Unable to update application instance networking. Application must be shut off to complete this action.","fieldErrors":null}`
 
 * **Sample Call:**
 
 ```bash
 curl -H "Authorization: Bearer [YOUR TOKEN]" \
-     -X DELETE https://manage.cloudistics.com/api/latest/applications/[APPLICATION UUID]/vnic \
-     -d '{"uuid": "d0c8fdea-b5a2-11e7-abc4-cec278b6b50a"}'
+     -H "Content-Type: application/json" \
+     -X DELETE https://manage.cloudistics.com/api/latest/applications/[APPLICATION UUID]/vnics/[VNIC_UUID]
 ```
 
 * **Notes:**
@@ -2697,7 +2503,7 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 
 * **URL**
 
-  `/api/latest/applications/[APPLICATION UUID]/disk`
+  `/api/latest/applications/[APPLICATION UUID]/disks`
 
 * **Method:**
 
@@ -2709,11 +2515,7 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 
 * **Data Params**
 
-```json
-{
-  "uuid" : "dae080e2-b5a6-11e7-abc4-cec278b6b50a",
-}
-```
+   None
 
 * **Success Response:**
 
@@ -2734,18 +2536,18 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
   * **Code:** 404 Not Found <br />
     **Content:** `{"code":"Resource Not Found","message":"Application with uuid e696855c-186f-4c2a-a381-1637195bef3f does not exist.","fieldErrors":null}`
 
+  * **Code:** 422 Unprocessable Entity <br />
+    **Content:** `{"code":"Invalid Request","message":"Error removing disk from application. At least one storage disk is required for an application.","fieldErrors":null}`
+
   * **Code:** 429 Too Many Requests <br />
     **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
-
-  * **Code:** 500 Internal Server Error <br />
-    **Content:** `{"code":"Invalid Request","message":"Error removing disk from application. At least one storage disk is required for an application.","fieldErrors":null}`
 
 * **Sample Call:**
 
 ```bash
 curl -H "Authorization: Bearer [YOUR TOKEN]" \
-     -X DELETE https://manage.cloudistics.com/api/latest/applications/[APPLICATION UUID]/disk \
-     -d '{"diskUuid": "dae080e2-b5a6-11e7-abc4-cec278b6b50a"}'
+     -H "Content-Type: application/json" \
+     -X DELETE https://manage.cloudistics.com/api/latest/applications/[APPLICATION UUID]/disks/[DISK_UUID]
 ```
 
 * **Notes:**
@@ -2794,16 +2596,17 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
   * **Code:** 404 Not Found <br />
     **Content:** `{"code":"Resource Not Found","message":"Application with uuid e696855c-186f-4c2a-a381-1637195bef3f does not exist.","fieldErrors":null}`
 
+  * **Code:** 422 Unprocessable Entity <br />
+    **Content:** `{"code":"Invalid Request","message":"Unable to edit application hardware assisted virtualization settings because the application is not shutdown.","fieldErrors":null}`
+
   * **Code:** 429 Too Many Requests <br />
     **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
-
-  * **Code:** 500 Internal Server Error <br />
-    **Content:** `{"code":"Invalid Request","message":"Unable to edit application hardware assisted virtualization settings because the application is not shutdown.","fieldErrors":null}`
 
 * **Sample Call:**
 
 ```bash
 curl -H "Authorization: Bearer [YOUR TOKEN]" \
+     -H "Content-Type: application/json" \
      -X PUT https://manage.cloudistics.com/api/latest/applications/[APPLICATION UUID]/hardware-assisted-virtualization \
      -d '{"hardwareAssistedVirtualization" : true}'
 ```
@@ -2861,6 +2664,7 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 
 ```bash
 curl -H "Authorization: Bearer [YOUR TOKEN]" \
+     -H "Content-Type: application/json" \
      -X PUT https://manage.cloudistics.com/api/latest/applications/[APPLICATION UUID]/automatic-recovery \
      -d '{"automaticRecovery" : true}'
 ```
@@ -2910,16 +2714,17 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
   * **Code:** 404 Not Found <br />
     **Content:** `{"code":"Resource Not Found","message":"Application with uuid e696855c-186f-4c2a-a381-1637195bef3f does not exist.","fieldErrors":null}`
 
+  * **Code:** 422 Unprocessable Entity <br />
+    **Content:** `{"code":"Invalid Request","message":""Unable to change vm mode because the application is not shutdown.","fieldErrors":null}`
+
   * **Code:** 429 Too Many Requests <br />
     **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
-
-  * **Code:** 500 Internal Server Error <br />
-    **Content:** `{"code":"Invalid Request","message":""Unable to change vm mode because the application is not shutdown.","fieldErrors":null}`
 
 * **Sample Call:**
 
 ```bash
 curl -H "Authorization: Bearer [YOUR TOKEN]" \
+     -H "Content-Type: application/json" \
      -X PUT https://manage.cloudistics.com/api/latest/applications/[APPLICATION UUID]/vm-mode \
      -d '{"vmMode" : "Enhanced"}'
 ```
@@ -2960,32 +2765,7 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 [
    {
       "uuid":"b576c8de-c70f-46d9-9a27-667416b2f788",
-      "name":"Snapshot One",
-      "createdTimestamp":"2016-11-15'T'12:00:00",
-      "size":1073741824,
-      "type":"Local",
-      "generated":"Manual",
-      "disasterRecovery":{
-         "transferStatus":"Transferring",
-         "transferPercentage":50
-      },
-      "bootOrder":[
-         {
-            "diskUuid":"1b35fadb-7c63-46a6-9011-1df2a4f34918",
-            "name":"Disk 1",
-            "order":1
-         },
-         {
-            "vnicUuid":"bf6199ea-a94b-4768-b24d-8994bf9bdf88",
-            "name":"vNIC 0",
-            "order":2
-         },
-         {
-            "diskUuid":"694c1484-ced4-4810-bcb3-a302ffb45f12",
-            "name":"Disk 2",
-            "order":3
-         }
-      ]
+      "name":"Snapshot One"
    }
 ]
 ```
@@ -3055,17 +2835,20 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
       {
          "diskUuid":"1b35fadb-7c63-46a6-9011-1df2a4f34918",
          "name":"Disk 1",
-         "order":1
+         "order":1,
+         "vnicUuid": null
       },
       {
          "vnicUuid":"bf6199ea-a94b-4768-b24d-8994bf9bdf88",
          "name":"vNIC 0",
-         "order":2
+         "order":2,
+         "diskUuid": null
       },
       {
          "diskUuid":"694c1484-ced4-4810-bcb3-a302ffb45f12",
          "name":"Disk 2",
-         "order":3
+         "order":3,
+         "vnicUuid": null
       }
    ]
 }
@@ -3136,11 +2919,11 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
   * **Code:** 404 Not Found <br />
     **Content:** `{"code":"Resource Not Found","message":"Application with uuid e696855c-186f-4c2a-a381-1637195bef3f does not exist.","fieldErrors":null}`
 
+  * **Code:** 422 Unprocessable Entity <br />
+    **Content:** `{"code":"Invalid Request","message":"Unable to create snapshot for application that is unresponsive.","fieldErrors":null}`
+
   * **Code:** 429 Too Many Requests <br />
     **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
-
-  * **Code:** 500 Internal Server Error <br />
-    **Content:** `{"code":"Invalid Request","message":"Unable to create snapshot for application that is unresponsive.","fieldErrors":null}`
 
 * **Sample Call:**
 
@@ -3194,11 +2977,11 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
   * **Code:** 404 Not Found <br />
     **Content:** `{"code":"Resource Not Found","message":"Snapshot with uuid 3625edfa-1d41-488c-bbdc-13d35bdeb9ae does not exist for application with uuid 36a371c5-a9aa-4f4f-b1d1-ed782a11bc6a.","fieldErrors":null}`
 
+  * **Code:** 422 Unprocessable Entity <br />
+    **Content:** `{"code":"Invalid Request","message":"Unable to delete snapshot for application that a template is currently being created from.","fieldErrors":null}`
+
   * **Code:** 429 Too Many Requests <br />
     **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
-
-  * **Code:** 500 Internal Server Error <br />
-    **Content:** `{"code":"Invalid Request","message":"Unable to delete snapshot for application that a template is currently being created from.","fieldErrors":null}`
 
 * **Sample Call:**
 
@@ -3253,11 +3036,11 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
   * **Code:** 404 Not Found <br />
     **Content:** `{"code":"Resource Not Found","message":"Snapshot with uuid 3625edfa-1d41-488c-bbdc-13d35bdeb9ae does not exist for application with uuid 36a371c5-a9aa-4f4f-b1d1-ed782a11bc6a.","fieldErrors":null}`
 
+  * **Code:** 422 Unprocessable Entity <br />
+    **Content:** `{"code":"Invalid Request","message":"Error renaming snapshot. Unable to rename a DR snapshot.","fieldErrors":null}`
+
   * **Code:** 429 Too Many Requests <br />
     **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
-
-  * **Code:** 500 Internal Server Error <br />
-    **Content:** `{"code":"Invalid Request","message":"Error renaming snapshot. Unable to rename a DR snapshot.","fieldErrors":null}`
 
 * **Sample Call:**
 
@@ -3301,8 +3084,7 @@ Returns json data about application groups within an organization.
 [
   {
     "uuid": "e696855c-186f-4c2a-a381-1637195bef3f",
-    "name": "Application Group",
-    "datacenterUuid": "101552a2-e436-415a-a1cd-a11e5cb1e06e"
+    "name": "Application Group"
   }
 ]
 ```
@@ -3429,11 +3211,11 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
   * **Code:** 404 Not Found <br />
     **Content:** `{"code":"Resource Not Found","message":"Datacenter with uuid 3625edfa-1d41-488c-bbdc-13d35bdeb9ae does not exist.","fieldErrors":null}`
 
+  * **Code:** 422 Unprocessable Entity <br />
+    **Content:** `{"code":"Invalid Request","message":"Application group with datacenter uuid 3625edfa-1d41-488c-bbdc-13d35bdeb9ae already exists.","fieldErrors":null}`
+
   * **Code:** 429 Too Many Requests <br />
     **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
-
-  * **Code:** 500 Internal Server Error <br />
-    **Content:** `{"code":"Invalid Request","message":"Application group with datacenter uuid 3625edfa-1d41-488c-bbdc-13d35bdeb9ae already exists.","fieldErrors":null}`
 
 * **Sample Call:**
 
@@ -3604,11 +3386,11 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
   * **Code:** 404 Not Found <br />
     **Content:** `{"code":"Resource Not Found","message":"Application Group with uuid 3625edfa-1d41-488c-bbdc-13d35bdeb9ae does not exist.","fieldErrors":null}`
 
+  * **Code:** 422 Unprocessable Entity <br />
+    **Content:** `{"code":"Invalid Request","message":"Application's datacenter and application group's datacenter are not the same.","fieldErrors":null}`
+
   * **Code:** 429 Too Many Requests <br />
     **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
-
-  * **Code:** 500 Internal Server Error <br />
-    **Content:** `{"code":"Invalid Request","message":"Application's datacenter and application group's datacenter are not the same.","fieldErrors":null}`
 
 * **Sample Call:**
 
@@ -3672,11 +3454,11 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
   * **Code:** 404 Not Found <br />
     **Content:** `{"code":"Resource Not Found","message":"Application Group with uuid 3625edfa-1d41-488c-bbdc-13d35bdeb9ae does not exist.","fieldErrors":null}`
 
+  * **Code:** 422 Unprocessable Entity <br />
+    **Content:** `{"code":"Invalid Request","message":"Application is not in the application group requested to be removed from.","fieldErrors":null}`
+
   * **Code:** 429 Too Many Requests <br />
     **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
-
-  * **Code:** 500 Internal Server Error <br />
-    **Content:** `{"code":"Invalid Request","message":"Application is not in the application group requested to be removed from.","fieldErrors":null}`
 
 * **Sample Call:**
 
@@ -3956,23 +3738,7 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 [
   {
     "uuid": "8ffb9733-c941-4007-a0dd-6b0981aceea1",
-    "name": "Datacenter",
-    "allocations": {
-      "migrationZones": [
-        {
-          "migrationZoneUuid": "8ffb9733-c941-4007-a0dd-6b0981aceea1",
-          "categoryUuid": "6aa39a35-af3d-4f6d-b38a-284f7da8a28a",
-          "vcpu": 4,
-          "memory": 1073741824
-        }
-      ],
-      "flashPools": [
-        {
-          "flashPoolUuid": "06fd6c19-d83c-40d5-9f81-0712dce483b0",
-          "size": 1073741824
-        }
-      ]
-    }
+    "name": "Datacenter"
   }
 ]
 ```
@@ -4103,25 +3869,7 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 [
   {
     "uuid": "a70f296c-a714-4f3e-af40-1866437a9fb3",
-    "name": "Migration Zone",
-    "allocations": {
-      "categories": [
-        {
-          "categoryUuid": "e011b462-f015-408d-af53-6a36597293ab",
-          "cpuTotal": 4,
-          "cpuAllocated": 2,
-          "memoryTotal": 2147483648,
-          "memoryAllocated": 1073741824
-        }
-      ],
-      "datacenters": [
-        {
-          "datacenterUuid": "6b70d7bc-92bd-4140-a25e-e5727684d58b",
-          "cpuAllocated": 2,
-          "memoryAllocated": 1073741824
-        }
-      ]
-    }
+    "name": "Migration Zone"
   }
 ]
 ```
@@ -4220,8 +3968,138 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
   None
 
 
-### List all Vnets
-  Returns json data about vnets within an organization.
+### Get Migration Zone Statistics
+  Returns json data about the statistics for a migration zone.
+
+* **URL**
+
+  `/api/latest/migration-zones/[MIGRATION ZONE UUID]/stats`
+
+* **Method:**
+
+  `GET`
+
+*  **URL Params**
+
+   **Optional:**
+
+   `start-timestamp=[date with pattern "yyyy-MM-dd'T'HH:mm:ss"]`
+
+   `end-timestamp=[date with pattern "yyyy-MM-dd'T'HH:mm:ss"]`
+
+   `start-index=[positive integer]` *Defaults to 0*
+
+   `limit-count=[positive integer]` *Defaults to 1000*
+
+* **Data Params**
+
+  None
+
+* **Success Response:**
+
+  * **Code:** 200 OK<br />
+    **Content:**
+```json
+[
+  {
+    "timestamp": "2017-01-11'T'12:00:00",
+    "cpuUtilization": 50,
+    "memoryUtilization": 1073741824
+  }
+]
+```
+
+* **Error Response:**
+
+  * **Code:** 400 Bad Request <br />
+    **Content:** `{"code":"Bad Request","message":"Invalid request parameter for REST API. Limit count must be a positive integer.","fieldErrors":null}`
+
+  * **Code:** 403 Forbidden <br />
+    **Content:** `{"code":"Access Denied","message":"Unable to access REST API. Invalid token.","fieldErrors":null}`
+
+  * **Code:** 404 Not Found <br />
+    **Content:** `{"code":"Resource Not Found","message":"Migration Zone with uuid 21ed442c-be25-11e6-a4a6-cec0c932ce01 does not exist.","fieldErrors":null}`
+
+  * **Code:** 429 Too Many Requests <br />
+    **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
+
+* **Sample Call:**
+
+```bash
+curl -H "Authorization: Bearer [YOUR TOKEN]" \
+     -G https://manage.cloudistics.com/api/latest/migration-zones/[MIGRATION ZONE UUID]/stats \
+     -d 'start-timestamp=2017-01-11T12:00:00'
+```
+
+* **Notes:**
+
+  None  
+
+
+### List all VLANs
+  Returns json data about VLANs within an organization.
+
+* **URL**
+
+  `/api/latest/vlans`
+
+* **Method:**
+
+  `GET`
+
+*  **URL Params**
+
+   **Optional:**
+
+   `start-index=[positive integer]` *Defaults to 0*
+
+   `limit-count=[positive integer]` *Defaults to 1000*
+
+* **Data Params**
+
+  None
+
+* **Success Response:**
+
+  * **Code:** 200 OK<br />
+    **Content:**
+```json
+[
+   {
+      "uuid": "14cf1c96-515e-4819-961c-c7cc7f410e9b",
+      "name":"VLAN",
+      "locationUuid":"48efa3d8-c2a5-43ab-9dac-b18158203d43",
+      "vlanTag":999
+   }
+]
+```
+
+* **Error Response:**
+
+  * **Code:** 400 Bad Request <br />
+    **Content:** `{"code":"Bad Request","message":"Invalid request parameter for REST API. Limit count must be a positive integer.","fieldErrors":null}`
+
+  * **Code:** 403 Forbidden <br />
+    **Content:** `{"code":"Access Denied","message":"Unable to access REST API. Invalid token.","fieldErrors":null}`
+
+  * **Code:** 429 Too Many Requests <br />
+    **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
+
+* **Sample Call:**
+
+```bash
+curl -H "Authorization: Bearer [YOUR TOKEN]" \
+     -G https://manage.cloudistics.com/api/latest/vlans \
+     -d 'limit-count=10'
+```
+
+* **Notes:**
+
+  None
+
+
+### List all VNETs
+  Returns json data about VNETs within an organization.
 
 * **URL**
 
@@ -4250,38 +4128,8 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 ```json
 [
    {
-      "uuid": "14cf1c96-515e-4819-961c-c7cc7f410e9b",
-      "name":"Vnet",
-      "networkAddress":"3.3.3.3",
-      "subnetMask":"255.255.255.0",
-      "usableIpRange":"3.3.3.0-3.3.3.255",
-      "defaultGateway":"3.3.3.4",
-      "automaticDeployment":true,
-      "dhcpService":{
-         "startIpRange":"3.3.3.33",
-         "endIpRange":"3.3.3.40",
-         "leaseTime":86400,
-         "domainName":"Domain Name",
-         "primaryDnsServerIpAddress":"6.6.6.6",
-         "secondaryDnsServerIpAddress":"7.7.7.7",
-         "staticBindings":[
-            {
-               "hostname":"Host Name",
-               "macAddress":"08:62:66:2b:88:b3",
-               "ipAddress":"127.0.0.1"
-            }
-         ]
-      },
-      "routingService":{
-         "type":"Virtual Networking",
-         "vnetUuid":"23fe4063-fdfd-4210-8a72-8494f99b4cea",
-         "addressMode":"Static",
-         "ipAddress":"4.4.4.4",
-         "subnetMask":"255.255.255.0",
-         "gateway":"4.4.4.44"
-      },
-      "nfvInstanceUuid":"101552a2-e436-415a-a1cd-a11e5cb1e06e",
-      "firewallProfileUuid":"3625edfa-1d41-488c-bbdc-13d35bdeb9ae"
+      "uuid":"14cf1c96-515e-4819-961c-c7cc7f410e9b",
+      "name":"VNET"
    }
 ]
 ```
@@ -4310,8 +4158,63 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
   None
 
 
-### Get Vnet Information
-  Returns json data about a vnet.
+### Get VLAN Information
+  Returns json data about a VLAN.
+
+* **URL**
+
+  `/api/latest/vlans/[VLAN UUID]`
+
+* **Method:**
+
+  `GET`
+
+*  **URL Params**
+
+   None
+
+* **Data Params**
+
+  None
+
+* **Success Response:**
+
+  * **Code:** 200 OK<br />
+    **Content:**
+```json
+{
+   "uuid": "14cf1c96-515e-4819-961c-c7cc7f410e9b",
+   "name":"VLAN",
+   "locationUuid":"48efa3d8-c2a5-43ab-9dac-b18158203d43",
+   "vlanTag":999
+}
+```
+
+* **Error Response:**
+
+  * **Code:** 403 Forbidden <br />
+    **Content:** `{"code":"Access Denied","message":"Unable to access REST API. Invalid token.","fieldErrors":null}`
+
+  * **Code:** 404 Not Found <br />
+    **Content:** `{"code":"Resource Not Found","message":"VLAN with uuid 3c163fce-f56e-4a27-aa67-0141f5470b29 does not exist.","fieldErrors":null}`
+
+  * **Code:** 429 Too Many Requests <br />
+    **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
+
+* **Sample Call:**
+
+```bash
+curl -H "Authorization: Bearer [YOUR TOKEN]" \
+     -G https://manage.cloudistics.com/api/latest/vlans/[VLAN UUID]
+```
+
+* **Notes:**
+
+  None
+
+
+### Get VNET Information
+  Returns json data about a VNET.
 
 * **URL**
 
@@ -4335,8 +4238,8 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
     **Content:**
 ```json
 {
-   "uuid": "14cf1c96-515e-4819-961c-c7cc7f410e9b",
-   "name":"Vnet",
+   "uuid":"14cf1c96-515e-4819-961c-c7cc7f410e9b",
+   "name":"VNET",
    "networkAddress":"3.3.3.3",
    "subnetMask":"255.255.255.0",
    "usableIpRange":"3.3.3.0-3.3.3.255",
@@ -4358,8 +4261,8 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
       ]
    },
    "routingService":{
-      "type":"Virtual Networking",
-      "vnetUuid":"23fe4063-fdfd-4210-8a72-8494f99b4cea",
+      "type":"VNET",
+      "networkUuid":"23fe4063-fdfd-4210-8a72-8494f99b4cea",
       "addressMode":"Static",
       "ipAddress":"4.4.4.4",
       "subnetMask":"255.255.255.0",
@@ -4376,7 +4279,7 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
     **Content:** `{"code":"Access Denied","message":"Unable to access REST API. Invalid token.","fieldErrors":null}`
 
   * **Code:** 404 Not Found <br />
-    **Content:** `{"code":"Resource Not Found","message":"Vnet with uuid 3c163fce-f56e-4a27-aa67-0141f5470b29 does not exist.","fieldErrors":null}`
+    **Content:** `{"code":"Resource Not Found","message":"VNET with uuid 3c163fce-f56e-4a27-aa67-0141f5470b29 does not exist.","fieldErrors":null}`
 
   * **Code:** 429 Too Many Requests <br />
     **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
@@ -4393,12 +4296,12 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
   None
 
 
-### Get Firewall Profiles for Vnet
-  Returns json data about firewall profiles for a vnet.
+### Get Firewall Profile for VNET
+  Returns json data about the firewall profile for a VNET.
 
 * **URL**
 
-  `/api/latest/vnets/[VNET UUID]/firewall-profiles`
+  `/api/latest/vnets/[VNET UUID]/firewall-profile`
 
 * **Method:**
 
@@ -4406,11 +4309,7 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 
 *  **URL Params**
 
-   **Optional:**
-
-   `start-index=[positive integer]` *Defaults to 0*
-
-   `limit-count=[positive integer]` *Defaults to 1000*
+  None
 
 * **Data Params**
 
@@ -4421,28 +4320,32 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
   * **Code:** 200 OK<br />
     **Content:**
 ```json
-[
-  {
-    "uuid": "bd4341d9-89f2-481a-9b4a-03548aadaec1",
-    "name": "Application Firewall Profile",
-    "rules": [
+{
+   "uuid":"bd4341d9-89f2-481a-9b4a-03548aadaec1",
+   "name":"Application Firewall Profile",
+   "rules":[
       {
-        "order": 0,
-        "type": "Outgoing",
-        "protocol": "UDP",
-        "sourceRangeIps": [],
-        "sourceRangePorts": [],
-        "destinationRangeIps": [],
-        "destinationRangePorts": [
-          67,
-          68
-        ],
-        "action": "Allow",
-        "description": "Allow traffic from the application instances to the network service instance."
+         "order":0,
+         "type":"Outgoing",
+         "protocol":"UDP",
+         "sourceRangeIps":[
+
+         ],
+         "sourceRangePorts":[
+
+         ],
+         "destinationRangeIps":[
+
+         ],
+         "destinationRangePorts":[
+            67,
+            68
+         ],
+         "action":"Allow",
+         "description":"Allow traffic from the application instances to the network service instance."
       }
-    ]
-  }
-]
+   ]
+}
 ```
 
 * **Error Response:**
@@ -4454,7 +4357,7 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
     **Content:** `{"code":"Access Denied","message":"Unable to access REST API. Invalid token.","fieldErrors":null}`
 
   * **Code:** 404 Not Found <br />
-    **Content:** `{"code":"Resource Not Found","message":"Vnet with uuid 3c163fce-f56e-4a27-aa67-0141f5470b29 does not exist.","fieldErrors":null}`
+    **Content:** `{"code":"Resource Not Found","message":"VNET with uuid 3c163fce-f56e-4a27-aa67-0141f5470b29 does not exist.","fieldErrors":null}`
 
   * **Code:** 429 Too Many Requests <br />
     **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
@@ -4472,8 +4375,80 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
   None
 
 
-### Create Vnet
-  Creates a vnet and returns json data about the action.
+### Create VLAN
+  Creates a VLAN and returns json data about the action.
+
+* **URL**
+
+  `/api/latest/vlans/`
+
+* **Method:**
+
+  `POST`
+
+*  **URL Params**
+
+  None
+
+* **Data Params**
+
+```json
+{
+   "name":"New VLAN",
+   "locationUuid":"48efa3d8-c2a5-43ab-9dac-b18158203d43",
+   "vlanTag":999
+}
+```
+
+* **Success Response:**
+
+  * **Code:** 200 OK<br />
+    **Content:**
+```json
+{
+  "message": "VLAN successfully created."
+}
+```
+    
+  * **Code:** 202 Accepted <br />
+    **Content:**
+```json
+{
+  "actionUuid": "71011d4e-a4f7-4ab1-95e0-9e8986fb3f2c",
+  "objectUuid": "[VLAN UUID]"
+}
+```
+
+* **Error Response:**
+
+  * **Code:** 400 Bad Request <br />
+    **Content:** `{"code":"Bad Request: Invalid request data","message":"field: [name] error: [required field is empty or not provided]","fieldErrors":null}`
+
+  * **Code:** 403 Forbidden <br />
+    **Content:** `{"code":"Access Denied","message":"Unable to access REST API. Invalid token.","fieldErrors":null}`
+
+  * **Code:** 422 Unprocessable Entity <br />
+    **Content:** `{"code":"Invalid Request","message":"VLAN with name New Vlan already already exists for organization.","fieldErrors":null}`
+
+  * **Code:** 429 Too Many Requests <br />
+    **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
+
+* **Sample Call:**
+
+```bash
+curl -H "Authorization: Bearer [YOUR TOKEN]" \
+     -H "Content-Type: application/json" \
+     -X POST https://manage.cloudistics.com/api/latest/vlans \
+     -d '{"name":"New VLAN","locationUuid":"48efa3d8-c2a5-43ab-9dac-b18158203d43","vlanTag":999}'
+```
+
+* **Notes:**
+
+  * The request will fail if a VLAN already exists for the tag in the specified location.
+
+
+### Create VNET
+  Creates a VNET and returns json data about the action.
 
 * **URL**
 
@@ -4491,7 +4466,7 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 
 ```json
 {
-   "name":"New Vnet",
+   "name":"New VNET",
    "networkAddress":"3.3.3.3",
    "subnetMask":"255.255.255.0",
    "defaultGateway":"3.3.3.4",
@@ -4512,12 +4487,12 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
       ]
    },
    "routingService":{
-      "type":"Virtual Networking",
-      "vnetUuid":"23fe4063-fdfd-4210-8a72-8494f99b4cea",
+      "networkUuid":"23fe4063-fdfd-4210-8a72-8494f99b4cea",
       "addressMode":"Static",
       "ipAddress":"4.4.4.4",
       "subnetMask":"255.255.255.0",
-      "gateway":"4.4.4.44"
+      "gateway":"4.4.4.44",
+      "firewallOverride":"5a457cf9-f486-4514-bcc4-334e9bc0011a"
    },
    "nfvInstance":{
       "datacenterUuid":"101552a2-e436-415a-a1cd-a11e5cb1e06e",
@@ -4533,7 +4508,8 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
       "categoryUuid":"a55bb4da-7cad-40cb-95e0-37db93c7aa5e",
       "enableAutomaticRecovery":true
    },
-   "firewallProfileUuid":"3625edfa-1d41-488c-bbdc-13d35bdeb9ae"
+   "firewallProfileUuid":"3625edfa-1d41-488c-bbdc-13d35bdeb9ae",
+   "firewallOverrideUuid":"e17ccfb1-a4bf-4941-9e81-dd6eee73e29f"
 }
 ```
 
@@ -4543,7 +4519,7 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
     **Content:**
 ```json
 {
-  "message": "Vnet successfully created."
+  "message": "VNET successfully created."
 }
 ```
     
@@ -4564,11 +4540,11 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
   * **Code:** 403 Forbidden <br />
     **Content:** `{"code":"Access Denied","message":"Unable to access REST API. Invalid token.","fieldErrors":null}`
 
+  * **Code:** 422 Unprocessable Entity <br />
+    **Content:** `{"code":"Invalid Request","message":"VNET with name New Vnet already already exists for organization.","fieldErrors":null}`
+
   * **Code:** 429 Too Many Requests <br />
     **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
-
-  * **Code:** 500 Internal Server Error <br />
-    **Content:** `{"code":"Invalid Request","message":"Vnet with name New Vnet already already exists for organization.","fieldErrors":null}`
 
 * **Sample Call:**
 
@@ -4576,32 +4552,34 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 curl -H "Authorization: Bearer [YOUR TOKEN]" \
      -H "Content-Type: application/json" \
      -X POST https://manage.cloudistics.com/api/latest/vnets \
-     -d '{"name":"New Vnet","networkAddress":"3.3.3.3","subnetMask":"255.255.255.0","defaultGateway":"3.3.3.4","automaticDeployment":true,"dhcpService":{"startIpRange":"3.3.3.33","endIpRange":"3.3.3.40","leaseTime":86400,"domainName":"Domain Name","primaryDnsServerIpAddress":"6.6.6.6","secondaryDnsServerIpAddress":"7.7.7.7","staticBindings":[{"hostname":"Host Name","macAddress":"08:62:66:2b:88:b3","ipAddress":"127.0.0.1"}]},"routingService":{"type":"Virtual Networking","vnetUuid":"23fe4063-fdfd-4210-8a72-8494f99b4cea","addressMode":"Static","ipAddress":"4.4.4.4","subnetMask":"255.255.255.0","gateway":"4.4.4.44"},"nfvInstance":{"datacenterUuid":"101552a2-e436-415a-a1cd-a11e5cb1e06e","migrationZoneUuid":"6c47337b-9ee0-434d-90a6-2743b1bcdf9a","flashPoolUuid":"0b9512cd-7e40-4fd8-a2c2-74189d6b57a3","vcpus":4,"memory":1073741824,"tags":[{"uuid":"fa527c37-3582-41e5-afcb-4b181b8e39aa"}],"categoryUuid":"a55bb4da-7cad-40cb-95e0-37db93c7aa5e","enableAutomaticRecovery":true},"firewallProfileUuid":"3625edfa-1d41-488c-bbdc-13d35bdeb9ae"}'
+     -d '{"name":"New VNET","networkAddress":"3.3.3.3","subnetMask":"255.255.255.0","defaultGateway":"3.3.3.4","automaticDeployment":true,"dhcpService":{"startIpRange":"3.3.3.33","endIpRange":"3.3.3.40","leaseTime":86400,"domainName":"Domain Name","primaryDnsServerIpAddress":"6.6.6.6","secondaryDnsServerIpAddress":"7.7.7.7","staticBindings":[{"hostname":"Host Name","macAddress":"08:62:66:2b:88:b3","ipAddress":"127.0.0.1"}]},"routingService":{"networkUuid":"23fe4063-fdfd-4210-8a72-8494f99b4cea","addressMode":"Static","ipAddress":"4.4.4.4","subnetMask":"255.255.255.0","gateway":"4.4.4.44","firewallOverride":"5a457cf9-f486-4514-bcc4-334e9bc0011a"},"nfvInstance":{"datacenterUuid":"101552a2-e436-415a-a1cd-a11e5cb1e06e","migrationZoneUuid":"6c47337b-9ee0-434d-90a6-2743b1bcdf9a","flashPoolUuid":"0b9512cd-7e40-4fd8-a2c2-74189d6b57a3","vcpus":4,"memory":1073741824,"tags":[{"uuid":"fa527c37-3582-41e5-afcb-4b181b8e39aa"}],"categoryUuid":"a55bb4da-7cad-40cb-95e0-37db93c7aa5e","enableAutomaticRecovery":true},"firewallProfileUuid":"3625edfa-1d41-488c-bbdc-13d35bdeb9ae","firewallOverrideUuid":"e17ccfb1-a4bf-4941-9e81-dd6eee73e29f"}'
 ```
 
 * **Notes:**
 
-  * The NFV instance for the vnet can be automatically deployed or manually linked.
-    * If the vnet is manually linked, the user only supplies the name, network address, default gateway, firewall profile and that it is not automatically deployed.
-    * If the vnet is automatically deployed, the user follows the following rules on which fields are optional or not.
-  * The DHCP service must be supplied if the user chooses to automatically deploy the vnet.
+  * The NFV instance for the VNET can be automatically deployed or manually linked.
+    * If the VNET is manually linked, the user only supplies the name, network address, default gateway, firewall profile and that it is not automatically deployed.
+    * If the VNET is automatically deployed, the user follows the following rules on which fields are optional or not.
+  * The DHCP service must be supplied if the user chooses to automatically deploy the VNET.
     * The start IP range and end IP range are required. All other fields are optional.
-  * The Routing service must be supplied if the user chooses to automatically deploy the vnet.
-    * The user must supply its type, either "Virtual Networking" or "Bridged". If virtual networking is chosen, then the vnet must be supplied.
+  * The Routing service must be supplied if the user chooses to automatically deploy the VNET.
+    * The user must supply routing network.
     * The user must supply its address mode, either "Static" or "DHCP". If static is chosen the user must provide the IP address, subnet mask, and gateway. If DHCP is chosen the user cannot supply these options.
-  * The NFV instance is optional but can only be supplied if the user chooses to automatically deploy the vnet.
-    * If the user decides to not supply it, it means the vnet is incomplete and they will need to deploy the NFV instance later to make it complete.
+    * The external firewall override is not allowed when the routing service network is "VLAN", and is optional when the routing service network is "VNET".
+  * The NFV instance is optional but can only be supplied if the user chooses to automatically deploy the VNET.
+    * If the user decides to not supply it, it means the VNET is incomplete and they will need to deploy the NFV instance later to make it complete.
     * If the user does supply it, then the datacenter, migration zone, flash pool, cpus, memory, and whether to enable automatic recovery are required. The tags and category are optional.
   * The firewall profile is optional and can be supplied for both automatically deployed and manualy linked vnets.
-  * The response will only include the action information if the vnet is automatically deployed and complete (the NFV instance information is provided). Otherwise it will return a 200 OK response status that the changes were persisted to the database.
+  * The internal firewall override is optional and can be supplied for both automatically deployed and manualy linked vnets.
+  * The response will only include the action information if the VNET is automatically deployed and complete (the NFV instance information is provided). Otherwise it will return a 200 OK response status that the changes were persisted to the database.
 
 
-### Rename Vnet
-  Rename a vnet.
+### Rename Network
+  Rename a network.
 
 * **URL**
 
-  `/api/latest/vnets/[VNET UUID]/name`
+  `/api/latest/networks/[NETWORK UUID]/name`
 
 * **Method:**
 
@@ -4615,7 +4593,7 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 
 ```json
 {
-   "name":"New Vnet Name"
+   "name":"New Network Name"
 }
 ```
 
@@ -4625,7 +4603,7 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
     **Content:**
 ```json
 {
-  "message": "Vnet name updated successfully."
+  "message": "Network name updated successfully."
 }
 ```
 
@@ -4638,21 +4616,21 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
     **Content:** `{"code":"Access Denied","message":"Unable to access REST API. Invalid token.","fieldErrors":null}`
 
   * **Code:** 404 Not Found <br />
-    **Content:** `{"code":"Resource Not Found","message":"Vnet with uuid 3625edfa-1d41-488c-bbdc-13d35bdeb9ae does not exist.","fieldErrors":null}`
+    **Content:** `{"code":"Resource Not Found","message":"Network with uuid 3625edfa-1d41-488c-bbdc-13d35bdeb9ae does not exist.","fieldErrors":null}`
+
+  * **Code:** 422 Unprocessable Entity <br />
+    **Content:** `{"code":"Invalid Request","message":"Network with name New Network Name already already exists for organization.","fieldErrors":null}`
 
   * **Code:** 429 Too Many Requests <br />
     **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
-
-  * **Code:** 500 Internal Server Error <br />
-    **Content:** `{"code":"Invalid Request","message":"Vnet with name New Vnet Name already already exists for organization.","fieldErrors":null}`
 
 * **Sample Call:**
 
 ```bash
 curl -H "Authorization: Bearer [YOUR TOKEN]" \
      -H "Content-Type: application/json" \
-     -X PUT https://manage.cloudistics.com/api/latest/vnets/[VNET UUID]/name \
-     -d '{"name":"New Vnet Name"}'
+     -X PUT https://manage.cloudistics.com/api/latest/networks/[NETWORK UUID]/name \
+     -d '{"name":"New Network Name"}'
 ```
 
 * **Notes:**
@@ -4660,8 +4638,8 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
   None
 
 
-### Edit Vnet Properties
-  Edits a vnet's properties and returns json data about the action.
+### Edit VNET Properties
+  Edits a VNET's properties and returns json data about the action.
 
 * **URL**
 
@@ -4691,7 +4669,7 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
     **Content:**
 ```json
 {
-  "message": "Vnet properties updated successfully."
+  "message": "VNET properties updated successfully."
 }
 ```
     
@@ -4713,13 +4691,13 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
     **Content:** `{"code":"Access Denied","message":"Unable to access REST API. Invalid token.","fieldErrors":null}`
 
   * **Code:** 404 Not Found <br />
-    **Content:** `{"code":"Resource Not Found","message":"Vnet with uuid 3625edfa-1d41-488c-bbdc-13d35bdeb9ae does not exist.","fieldErrors":null}`
+    **Content:** `{"code":"Resource Not Found","message":"VNET with uuid 3625edfa-1d41-488c-bbdc-13d35bdeb9ae does not exist.","fieldErrors":null}`
+
+  * **Code:** 422 Unprocessable Entity <br />
+    **Content:** `{"code":"Invalid Request","message":"Invalid IP range. The range specified conflicts with another VNET's IP range","fieldErrors":null}`
 
   * **Code:** 429 Too Many Requests <br />
     **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
-
-  * **Code:** 500 Internal Server Error <br />
-    **Content:** `{"code":"Invalid Request","message":"Invalid IP range. The range specified conflicts with another vnet's IP range","fieldErrors":null}`
 
 * **Sample Call:**
 
@@ -4732,13 +4710,13 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 
 * **Notes:**
 
-  * This action can be performed on both automatically deployed and manually linked vnets.
-  * The request will fail if the IP range calculated using the network address and subnet mask does conflict with any other vnets and network switches in the organization.
-  * The response will only include the action information if the vnet is complete and the NFV instance is not shut off. Otherwise it will return a 200 OK response status that the changes were persisted to the database.
+  * This action can be performed on both automatically deployed and manually linked VNETs.
+  * The request will fail if the IP range calculated using the network address and subnet mask does conflict with any other VNETs and network switches in the organization.
+  * The response will only include the action information if the VNET is complete and the NFV instance is not shut off. Otherwise it will return a 200 OK response status that the changes were persisted to the database. For automatically deployed VNETs, when the subnet is changed, the dhcp range will be updated accordingly.
 
 
-### Edit Vnet DHCP Service
-  Edits a vnet's DHCP service and returns json data about the action.
+### Edit VNET DHCP Service
+  Edits a VNET's DHCP service and returns json data about the action.
 
 * **URL**
 
@@ -4778,7 +4756,7 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
     **Content:**
 ```json
 {
-  "message": "Vnet DHCP service updated successfully."
+  "message": "VNET DHCP service updated successfully."
 }
 ```
     
@@ -4800,13 +4778,13 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
     **Content:** `{"code":"Access Denied","message":"Unable to access REST API. Invalid token.","fieldErrors":null}`
 
   * **Code:** 404 Not Found <br />
-    **Content:** `{"code":"Resource Not Found","message":"Vnet with uuid 3625edfa-1d41-488c-bbdc-13d35bdeb9ae does not exist.","fieldErrors":null}`
+    **Content:** `{"code":"Resource Not Found","message":"VNET with uuid 3625edfa-1d41-488c-bbdc-13d35bdeb9ae does not exist.","fieldErrors":null}`
+
+  * **Code:** 422 Unprocessable Entity <br />
+    **Content:** `{"code":"Invalid Request","message":"Error editing DHCP service for vnet. The DHCP start IP range does not fall within the usable IP range of the vnet.","fieldErrors":null}`
 
   * **Code:** 429 Too Many Requests <br />
     **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
-
-  * **Code:** 500 Internal Server Error <br />
-    **Content:** `{"code":"Invalid Request","message":"Error editing DHCP service for vnet. The DHCP start IP range does not fall within the usable IP range of the vnet.","fieldErrors":null}`
 
 * **Sample Call:**
 
@@ -4819,13 +4797,13 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 
 * **Notes:**
 
-  * This action can only be performed on automatically deployed vnets.
+  * This action can only be performed on automatically deployed VNETs.
   * The start IP range and end IP range are required. All other fields are optional.
-  * The response will only include the action information if the vnet is complete and the NFV instance is not shut off. Otherwise it will return a 200 OK response status that the changes were persisted to the database.
+  * The response will only include the action information if the VNET is complete and the NFV instance is not shut off. Otherwise it will return a 200 OK response status that the changes were persisted to the database.
 
 
-### Edit Vnet Routing Service
-  Edits a vnet's routing service and returns json data about the action.
+### Edit VNET Routing Service
+  Edits a VNET's routing service and returns json data about the action.
 
 * **URL**
 
@@ -4843,8 +4821,7 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 
 ```json
 {
-   "type":"Virtual Networking",
-   "vnetUuid":"23fe4063-fdfd-4210-8a72-8494f99b4cea",
+   "networkUuid":"23fe4063-fdfd-4210-8a72-8494f99b4cea",
    "addressMode":"Static",
    "ipAddress":"4.4.4.4",
    "subnetMask":"255.255.255.0",
@@ -4858,7 +4835,7 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
     **Content:**
 ```json
 {
-  "message": "Vnet Routing service updated successfully."
+  "message": "VNET Routing service updated successfully."
 }
 ```
     
@@ -4880,13 +4857,13 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
     **Content:** `{"code":"Access Denied","message":"Unable to access REST API. Invalid token.","fieldErrors":null}`
 
   * **Code:** 404 Not Found <br />
-    **Content:** `{"code":"Resource Not Found","message":"Vnet with uuid 3625edfa-1d41-488c-bbdc-13d35bdeb9ae does not exist.","fieldErrors":null}`
+    **Content:** `{"code":"Resource Not Found","message":"VNET with uuid 3625edfa-1d41-488c-bbdc-13d35bdeb9ae does not exist.","fieldErrors":null}`
+
+  * **Code:** 422 Unprocessable Entity <br />
+    **Content:** `{"code":"Invalid Request","message":"Error editing routing service for VNET because the vnet has an action in progress.","fieldErrors":null}`
 
   * **Code:** 429 Too Many Requests <br />
     **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
-
-  * **Code:** 500 Internal Server Error <br />
-    **Content:** `{"code":"Invalid Request","message":"Error editing routing service for vnet because the vnet has an action in progress.","fieldErrors":null}`
 
 * **Sample Call:**
 
@@ -4894,19 +4871,19 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 curl -H "Authorization: Bearer [YOUR TOKEN]" \
      -H "Content-Type: application/json" \
      -X PUT https://manage.cloudistics.com/api/latest/vnets/[VNET UUID]/routing-service \
-     -d '{"type":"Virtual Networking","vnetUuid":"23fe4063-fdfd-4210-8a72-8494f99b4cea","addressMode":"Static","ipAddress":"4.4.4.4","subnetMask":"255.255.255.0","gateway":"4.4.4.44"}'
+     -d '{"networkUuid":"23fe4063-fdfd-4210-8a72-8494f99b4cea","addressMode":"Static","ipAddress":"4.4.4.4","subnetMask":"255.255.255.0","gateway":"4.4.4.44"}'
 ```
 
 * **Notes:**
 
-  * This action can only be performed on automatically deployed vnets.
-  * The type must be either "Virtual Networking" or "Bridged". If virtual networking is chosen, then the vnet must be supplied.
+  * This action can only be performed on automatically deployed VNETs.
+  * The routing service network must be supplied.
   * The address mode must be either "Static" or "DHCP". If static is chosen the user must provide the IP address, subnet mask, and gateway. If DHCP is chosen the user cannot supply these options.
-  * The response will only include the action information if the vnet is complete and is using resources (the NFV instance is running). Otherwise it will return a 200 OK response status that the changes were persisted to the database.
+  * The response will only include the action information if the VNET is complete and is using resources (the NFV instance is running). Otherwise it will return a 200 OK response status that the changes were persisted to the database.
 
 
-### Edit Vnet Firewall Profile
-  Edits a vnet's firewall profile and returns json data about the action.
+### Edit VNET Firewall Profile
+  Edits a VNET's firewall profile and returns json data about the action.
 
 * **URL**
 
@@ -4934,7 +4911,7 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
     **Content:**
 ```json
 {
-  "message": "Vnet firewall profile updated successfully."
+  "message": "VNET firewall profile updated successfully."
 }
 ```
     
@@ -4956,13 +4933,13 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
     **Content:** `{"code":"Access Denied","message":"Unable to access REST API. Invalid token.","fieldErrors":null}`
 
   * **Code:** 404 Not Found <br />
-    **Content:** `{"code":"Resource Not Found","message":"Vnet with uuid 3625edfa-1d41-488c-bbdc-13d35bdeb9ae does not exist.","fieldErrors":null}`
+    **Content:** `{"code":"Resource Not Found","message":"VNET with uuid 3625edfa-1d41-488c-bbdc-13d35bdeb9ae does not exist.","fieldErrors":null}`
+
+  * **Code:** 422 Unprocessable Entity <br />
+    **Content:** `{"code":"Invalid Request","message":"Error editing firewall profile for VNET because because the VNET has an action in progress.","fieldErrors":null}`
 
   * **Code:** 429 Too Many Requests <br />
     **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
-
-  * **Code:** 500 Internal Server Error <br />
-    **Content:** `{"code":"Invalid Request","message":"Error editing firewall profile for vnet because because the vnet has an action in progress.","fieldErrors":null}`
 
 * **Sample Call:**
 
@@ -4975,12 +4952,12 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 
 * **Notes:**
 
-  * This action can be performed on both automatically deployed and manually linked vnets.
-  * If a null value or empty string for the firewall profile uuid is provided, then the current firewall profile will be removed from the vnet.
+  * This action can be performed on both automatically deployed and manually linked VNETs.
+  * If a null value or empty string for the firewall profile uuid is provided, then the current firewall profile will be removed from the VNET.
 
 
-### Deploy NFV Instance to Vnet
-  Deploys a NFV instance to a vnet and returns json data about the action.
+### Deploy NFV Instance to VNET
+  Deploys a NFV instance to a VNET and returns json data about the action.
 
 * **URL**
 
@@ -4998,18 +4975,30 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 
 ```json
 {
-   "datacenterUuid":"101552a2-e436-415a-a1cd-a11e5cb1e06e",
-   "migrationZoneUuid":"6c47337b-9ee0-434d-90a6-2743b1bcdf9a",
-   "flashPoolUuid":"0b9512cd-7e40-4fd8-a2c2-74189d6b57a3",
-   "vcpus":4,
-   "memory":1073741824,
-   "tags":[
+  "routingService":{
+    "networkUuid":"23fe4063-fdfd-4210-8a72-8494f99b4cea",
+    "addressMode":"Static",
+    "ipAddress":"4.4.4.4",
+    "subnetMask":"255.255.255.0",
+    "gateway":"4.4.4.44",
+    "firewallOverride":"5a457cf9-f486-4514-bcc4-334e9bc0011a"
+  },
+  "nfvInstance":{
+    "datacenterUuid":"101552a2-e436-415a-a1cd-a11e5cb1e06e",
+    "migrationZoneUuid":"6c47337b-9ee0-434d-90a6-2743b1bcdf9a",
+    "flashPoolUuid":"0b9512cd-7e40-4fd8-a2c2-74189d6b57a3",
+    "vcpus":4,
+    "memory":1073741824,
+    "tags":[
       {
          "uuid":"fa527c37-3582-41e5-afcb-4b181b8e39aa"
       }
-   ],
-   "categoryUuid":"a55bb4da-7cad-40cb-95e0-37db93c7aa5e",
-   "enableAutomaticRecovery":true
+    ],
+    "categoryUuid":"a55bb4da-7cad-40cb-95e0-37db93c7aa5e",
+    "enableAutomaticRecovery":true
+  },
+  "firewallProfileUuid":"3625edfa-1d41-488c-bbdc-13d35bdeb9ae",
+  "firewallOverrideUuid":"e17ccfb1-a4bf-4941-9e81-dd6eee73e29f"
 }
 ```
 
@@ -5033,13 +5022,13 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
     **Content:** `{"code":"Access Denied","message":"Unable to access REST API. Invalid token.","fieldErrors":null}`
 
   * **Code:** 404 Not Found <br />
-    **Content:** `{"code":"Resource Not Found","message":"Vnet with uuid 3625edfa-1d41-488c-bbdc-13d35bdeb9ae does not exist.","fieldErrors":null}`
+    **Content:** `{"code":"Resource Not Found","message":"VNET with uuid 3625edfa-1d41-488c-bbdc-13d35bdeb9ae does not exist.","fieldErrors":null}`
+
+  * **Code:** 422 Unprocessable Entity <br />
+    **Content:** `{"code":"Invalid Request","message":"Error deploying NFV instance to VNET that is not auto-deployed.","fieldErrors":null}`
 
   * **Code:** 429 Too Many Requests <br />
     **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
-
-  * **Code:** 500 Internal Server Error <br />
-    **Content:** `{"code":"Invalid Request","message":"Error deploying NFV instance to vnet that is not auto-deployed.","fieldErrors":null}`
 
 * **Sample Call:**
 
@@ -5047,16 +5036,21 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 curl -H "Authorization: Bearer [YOUR TOKEN]" \
      -H "Content-Type: application/json" \
      -X PUT https://manage.cloudistics.com/api/latest/vnets/[VNET UUID]/deploy-nfv-instance \
-     -d '{"datacenterUuid":"101552a2-e436-415a-a1cd-a11e5cb1e06e","migrationZoneUuid":"6c47337b-9ee0-434d-90a6-2743b1bcdf9a","flashPoolUuid":"0b9512cd-7e40-4fd8-a2c2-74189d6b57a3","vcpus":4,"memory":1073741824,"tags":[{"uuid":"fa527c37-3582-41e5-afcb-4b181b8e39aa"}],"categoryUuid":"a55bb4da-7cad-40cb-95e0-37db93c7aa5e","enableAutomaticRecovery":true}'
+     -d '{"routingService":{"networkUuid":"23fe4063-fdfd-4210-8a72-8494f99b4cea","addressMode":"Static","ipAddress":"4.4.4.4","subnetMask":"255.255.255.0","gateway":"4.4.4.44","firewallOverride":"5a457cf9-f486-4514-bcc4-334e9bc0011a"},"nfvInstance":{"datacenterUuid":"101552a2-e436-415a-a1cd-a11e5cb1e06e","migrationZoneUuid":"6c47337b-9ee0-434d-90a6-2743b1bcdf9a","flashPoolUuid":"0b9512cd-7e40-4fd8-a2c2-74189d6b57a3","vcpus":4,"memory":1073741824,"tags":[{"uuid":"fa527c37-3582-41e5-afcb-4b181b8e39aa"}],"categoryUuid":"a55bb4da-7cad-40cb-95e0-37db93c7aa5e","enableAutomaticRecovery":true}}'
 ```
 
 * **Notes:**
 
-  * This action can only be performed on automatically deployed vnets that are incomplete (do not have a NFV instance).
+  * This action can only be performed on automatically deployed VNETs that are incomplete (do not have a NFV instance).
   * The datacenter, migration zone, flash pool, cpus, memory, and whether to enable automatic recovery are required. The tags and category are optional.
+  * The Routing service is optional. If not provided, the existing routing service options for target VNET will be used. If not provided and no routing service options exist for target vnet, the request will fail.
+    * The user must supply routing network.
+    * The user must supply its address mode, either "Static" or "DHCP". If static is chosen the user must provide the IP address, subnet mask, and gateway. If DHCP is chosen the user cannot supply these options.
+    * The external firewall override is not allowed when the routing service network is "VLAN", and is optional when the routing service network is "VNET".
+  * The internal firewall override is not allowed when the routing service network is "VLAN", and is optional when the routing service network is "VNET" type.
 
 
-### Remove NFV Instance from Vnet
+### Remove NFV Instance from VNET
   Removes a NFV instance from a vnet and returns json data about the action.
 
 * **URL**
@@ -5095,13 +5089,13 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
     **Content:** `{"code":"Access Denied","message":"Unable to access REST API. Invalid token.","fieldErrors":null}`
 
   * **Code:** 404 Not Found <br />
-    **Content:** `{"code":"Resource Not Found","message":"Vnet with uuid 3625edfa-1d41-488c-bbdc-13d35bdeb9ae does not exist.","fieldErrors":null}`
+    **Content:** `{"code":"Resource Not Found","message":"VNET with uuid 3625edfa-1d41-488c-bbdc-13d35bdeb9ae does not exist.","fieldErrors":null}`
+
+  * **Code:** 422 Unprocessable Entity <br />
+    **Content:** `{"code":"Invalid Request","message":"Error removing NFV instance from VNET that is not auto-deployed.","fieldErrors":null}`
 
   * **Code:** 429 Too Many Requests <br />
     **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
-
-  * **Code:** 500 Internal Server Error <br />
-    **Content:** `{"code":"Invalid Request","message":"Error removing NFV instance from vnet that is not auto-deployed.","fieldErrors":null}`
 
 * **Sample Call:**
 
@@ -5113,11 +5107,11 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 
 * **Notes:**
 
-  * This action can only be performed on automatically deployed vnets that are complete (have a NFV instance).
+  * This action can only be performed on automatically deployed VNETs that are complete (have a NFV instance).
 
 
-### Link NFV Instance to Vnet
-  Links a NFV instance to a vnet.
+### Link NFV Instance to VNET
+  Links a NFV instance to a VNET.
 
 * **URL**
 
@@ -5145,7 +5139,7 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
     **Content:**
 ```json
 {
-  "message": "NFV instance linked to Vnet successfully."
+  "message": "NFV instance linked to VNET successfully."
 }
 ```
 
@@ -5158,13 +5152,13 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
     **Content:** `{"code":"Access Denied","message":"Unable to access REST API. Invalid token.","fieldErrors":null}`
 
   * **Code:** 404 Not Found <br />
-    **Content:** `{"code":"Resource Not Found","message":"Vnet with uuid 3625edfa-1d41-488c-bbdc-13d35bdeb9ae does not exist.","fieldErrors":null}`
+    **Content:** `{"code":"Resource Not Found","message":"VNET with uuid 3625edfa-1d41-488c-bbdc-13d35bdeb9ae does not exist.","fieldErrors":null}`
+
+  * **Code:** 422 Unprocessable Entity <br />
+    **Content:** `{"code":"Invalid Request","message":"Error linking NFV instance to VNET that is auto-deployed.","fieldErrors":null}`
 
   * **Code:** 429 Too Many Requests <br />
     **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
-
-  * **Code:** 500 Internal Server Error <br />
-    **Content:** `{"code":"Invalid Request","message":"Error linking NFV instance to vnet that is auto-deployed.","fieldErrors":null}`
 
 * **Sample Call:**
 
@@ -5177,12 +5171,12 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 
 * **Notes:**
 
-  * This action can only be performed on manually linked vnets that are incomplete (do not have a NFV instance).
-  * The application being linked as an NFV instance to the vnet must have a vNIC with its networking type set to Virtual Networking with this vnet selected.
+  * This action can only be performed on manually linked VNETs that are incomplete (do not have a NFV instance).
+  * The application being linked as an NFV instance to the VNET must have a vNIC with its networking type set to VNET with this VNET selected.
 
 
-### Unlink NFV Instance from Vnet
-  Unlinks a NFV instance from a vnet.
+### Unlink NFV Instance from VNET
+  Unlinks a NFV instance from a VNET.
 
 * **URL**
 
@@ -5206,7 +5200,7 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
     **Content:**
 ```json
 {
-  "message": "NFV instance unlinked from Vnet successfully."
+  "message": "NFV instance unlinked from VNET successfully."
 }
 ```
 
@@ -5219,13 +5213,13 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
     **Content:** `{"code":"Access Denied","message":"Unable to access REST API. Invalid token.","fieldErrors":null}`
 
   * **Code:** 404 Not Found <br />
-    **Content:** `{"code":"Resource Not Found","message":"Vnet with uuid 3625edfa-1d41-488c-bbdc-13d35bdeb9ae does not exist.","fieldErrors":null}`
+    **Content:** `{"code":"Resource Not Found","message":"VNET with uuid 3625edfa-1d41-488c-bbdc-13d35bdeb9ae does not exist.","fieldErrors":null}`
+
+  * **Code:** 422 Unprocessable Entity <br />
+    **Content:** `{"code":"Invalid Request","message":"Error unlinking NFV instance from VNET that is auto-deployed.","fieldErrors":null}`
 
   * **Code:** 429 Too Many Requests <br />
     **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
-
-  * **Code:** 500 Internal Server Error <br />
-    **Content:** `{"code":"Invalid Request","message":"Error unlinking NFV instance from vnet that is auto-deployed.","fieldErrors":null}`
 
 * **Sample Call:**
 
@@ -5237,10 +5231,10 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 
 * **Notes:**
 
-  * This action can only be performed on manually linked vnets that are complete (have a NFV instance).
+  * This action can only be performed on manually linked VNETs that are complete (have a NFV instance).
 
 
-### Delete Vnet
+### Delete VNET
   Deletes a vnet and returns json data about the action.
 
 * **URL**
@@ -5279,13 +5273,13 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
     **Content:** `{"code":"Access Denied","message":"Unable to access REST API. Invalid token.","fieldErrors":null}`
 
   * **Code:** 404 Not Found <br />
-    **Content:** `{"code":"Resource Not Found","message":"Vnet with uuid 3625edfa-1d41-488c-bbdc-13d35bdeb9ae does not exist.","fieldErrors":null}`
+    **Content:** `{"code":"Resource Not Found","message":"VNET with uuid 3625edfa-1d41-488c-bbdc-13d35bdeb9ae does not exist.","fieldErrors":null}`
+
+  * **Code:** 422 Unprocessable Entity <br />
+    **Content:** `{"code":"Invalid Request","message":"Error deleting vnet that has applications running on it.","fieldErrors":null}`
 
   * **Code:** 429 Too Many Requests <br />
     **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
-
-  * **Code:** 500 Internal Server Error <br />
-    **Content:** `{"code":"Invalid Request","message":"Error deleting vnet that has applications running on it.","fieldErrors":null}`
 
 * **Sample Call:**
 
@@ -5297,7 +5291,67 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 
 * **Notes:**
 
-  * This action can be performed on any vnet.
+  * This action can be performed on any VNET.
+
+
+### Delete VLAN
+  Deletes a VLAN and returns json data about the action.
+
+* **URL**
+
+  `/api/latest/vlans/[VLAN UUID]`
+
+* **Method:**
+
+  `DELETE`
+
+*  **URL Params**
+
+  None
+
+* **Data Params**
+
+  None
+
+* **Success Response:**
+    
+  * **Code:** 202 Accepted <br />
+    **Content:**
+```json
+{
+  "actionUuid": "71011d4e-a4f7-4ab1-95e0-9e8986fb3f2c",
+  "objectUuid": "[VLAN UUID]"
+}
+```
+
+* **Error Response:**
+
+  * **Code:** 400 Bad Request <br />
+    **Content:** `{"code":"Bad Request: Invalid request data","message":"field: [name] error: [required field is empty or not provided]","fieldErrors":null}`
+
+  * **Code:** 403 Forbidden <br />
+    **Content:** `{"code":"Access Denied","message":"Unable to access REST API. Invalid token.","fieldErrors":null}`
+
+  * **Code:** 404 Not Found <br />
+    **Content:** `{"code":"Resource Not Found","message":"VLAN with uuid 3625edfa-1d41-488c-bbdc-13d35bdeb9ae does not exist.","fieldErrors":null}`
+
+  * **Code:** 422 Unprocessable Entity <br />
+    **Content:** `{"code":"Invalid Request","message":"Error deleting VLAN that has applications running on it.","fieldErrors":null}`
+
+  * **Code:** 429 Too Many Requests <br />
+    **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
+
+* **Sample Call:**
+
+```bash
+curl -H "Authorization: Bearer [YOUR TOKEN]" \
+     -H "Content-Type: application/json" \
+     -X DELETE https://manage.cloudistics.com/api/latest/vlans/[VLAN UUID]
+```
+
+* **Notes:**
+
+  * This action can be performed on any VLAN.
 
 
 ### List all Flash Pools
@@ -5333,13 +5387,7 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 [
   {
     "uuid": "082be6c5-b782-4b1e-825a-0d09328878ef",
-    "name": "Flash Pool",
-    "allocations": [
-      {
-        "datacenterUuid": "37d8bc9c-39a3-4585-9f2a-edaf0a8efd81",
-        "size": 1073741824
-      }
-    ]
+    "name": "Flash Pool"
   }
 ]
 ```
@@ -5427,6 +5475,78 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
   None
 
 
+### Get Flash Pool Statistics
+  Returns json data about the statistics for a flash pool.
+
+* **URL**
+
+  `/api/latest/flash-pools/[FLASH POOL UUID]/stats`
+
+* **Method:**
+
+  `GET`
+
+*  **URL Params**
+
+   **Optional:**
+
+   `start-timestamp=[date with pattern "yyyy-MM-dd'T'HH:mm:ss"]`
+
+   `end-timestamp=[date with pattern "yyyy-MM-dd'T'HH:mm:ss"]`
+
+   `start-index=[positive integer]` *Defaults to 0*
+
+   `limit-count=[positive integer]` *Defaults to 1000*
+
+* **Data Params**
+
+  None
+
+* **Success Response:**
+
+  * **Code:** 200 OK<br />
+    **Content:**
+```json
+[
+  {
+    "timestamp": "2017-01-11'T'12:00:00",
+    "ioQueueDepth": 2299,
+    "iopsRead": 1212,
+    "iopsWrite": 1010,
+    "storageBandwidthReadBytesPerSecond": 9900000,
+    "storageBandwidthWriteBytesPerSecond": 6600000,
+    "storageUtilizationBytes": 12345678
+  }
+]
+```
+
+* **Error Response:**
+
+  * **Code:** 400 Bad Request <br />
+    **Content:** `{"code":"Bad Request","message":"Invalid request parameter for REST API. Limit count must be a positive integer.","fieldErrors":null}`
+
+  * **Code:** 403 Forbidden <br />
+    **Content:** `{"code":"Access Denied","message":"Unable to access REST API. Invalid token.","fieldErrors":null}`
+
+  * **Code:** 404 Not Found <br />
+    **Content:** `{"code":"Resource Not Found","message":"Flash Pool with uuid 689baf34-71c9-11e6-9d70-feff819cdc9f does not exist.","fieldErrors":null}`
+
+  * **Code:** 429 Too Many Requests <br />
+    **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
+
+* **Sample Call:**
+
+```bash
+curl -H "Authorization: Bearer [YOUR TOKEN]" \
+     -G https://manage.cloudistics.com/api/latest/flash-pools/[FLASH POOL UUID]/stats \
+     -d 'start-timestamp=2017-01-11T12:00:00'
+```
+
+* **Notes:**
+
+  None
+
+
 ### List all Templates
   Returns json data about templates within an organization.
 
@@ -5458,29 +5578,7 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 [
   {
     "uuid": "d1253ae3-6698-4e01-b11c-735181c7e813",
-    "name": "CentOS 7.2 - Docker 1.12",
-    "description": "Cloudistics-ready CentOS 7.2 - Docker 1.12",
-    "cpu": 4,
-    "memory": 1073741824,
-    "size": 1073741824,
-    "dateCreated": "2016-11-15'T'12:00:00",
-    "operatingSystem": {
-      "type": "CentOS Linux",
-      "version": "7"
-    },
-    "bootOrder": [
-      {
-        "diskUuid": "23bc2f5c-ac38-44fb-a96f-fdcd7dde25bf",
-        "name": "Disk 1",
-        "order": 1
-      },
-      {
-        "vnicUuid": "91d71039-42d3-4a2e-b9c1-cf6e01953eff",
-        "name": "vNIC 0",
-        "order": 2
-      }
-    ],
-    "vmMode": "Enhanced"
+    "name": "CentOS 7.2 - Docker 1.12"
   }
 ]
 ```
@@ -5549,12 +5647,14 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
       {
         "diskUuid": "23bc2f5c-ac38-44fb-a96f-fdcd7dde25bf",
         "name": "Disk 1",
-        "order": 1
+        "order": 1,
+        "vnicUuid": null
       },
       {
         "vnicUuid": "91d71039-42d3-4a2e-b9c1-cf6e01953eff",
         "name": "vNIC 0",
-        "order": 2
+        "order": 2,
+        "diskUuid": null
       }
     ],
     "vmMode": "Enhanced"
@@ -5647,12 +5747,12 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
   * **Code:** 404 Not Found <br />
     **Content:** `{"code":"Resource Not Found","message":"Disk with uuid 91996f7f-4b24-441d-a589-ecd25074a648 does not exist.","fieldErrors":null}`
 
-  * **Code:** 429 Too Many Requests <br />
-    **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
-
-  * **Code:** 500 Internal Server Error <br />
+  * **Code:** 422 Unprocessable Entity <br />
     **Content:** `{"code":"Invalid Request","message":"Error creating template from application instance. An application template already exists with this name.","fieldErrors":null}`
 
+  * **Code:** 429 Too Many Requests <br />
+    **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
+                                                                                                                                                                                              
 * **Sample Call:**
 
 ```bash
@@ -5725,6 +5825,102 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 * **Notes:**
 
   None
+
+
+### Import VM to Template
+  Imports a VM to a template and returns json data about the action.
+
+* **URL**
+
+  `/api/latest/templates/import-vm`
+
+* **Method:**
+
+  `POST`
+
+*  **URL Params**
+
+   None
+
+* **Data Params**
+
+```json
+{
+   "name":"New Template",
+   "description":"Template imported from VM",
+   "cpu":4,
+   "memory":1073741824,
+   "operatingSystem":{
+      "type":"CentOS Linux",
+      "version":"7"
+   },
+   "runSysPrep":true,
+   "virtioDriversInstalled":true,
+   "templateDiskFiles":[
+      {
+         "name":"disk2",
+         "path":"/path/to/disk2.vmdk"
+      },
+      {
+         "name":"disk1",
+         "path":"/path/to/disk1.vmdk"
+      }
+   ],
+   "sharedStorage":{
+      "type":"CIFS",
+      "hostname":"Hostname",
+      "shareName":"Share Name",
+      "username":"user",
+      "password":"password",
+      "domain":"Domain"
+   }
+}
+```
+
+* **Success Response:**
+
+  * **Code:** 202 Accepted <br />
+    **Content:**
+```json
+{
+  "actionUuid": "71011d4e-a4f7-4ab1-95e0-9e8986fb3f2c",
+  "objectUuid": "[TEMPLATE UUID]"
+}
+```
+
+* **Error Response:**
+
+  * **Code:** 403 Forbidden <br />
+    **Content:** `{"code":"Access Denied","message":"Unable to access REST API. Invalid token.","fieldErrors":null}`
+
+  * **Code:** 404 Not Found <br />
+    **Content:** `{"code":"Resource Not Found","message":"Application Template with uuid e696855c-186f-4c2a-a381-1637195bef3f does not exist.","fieldErrors":null}`
+
+  * **Code:** 422 Unprocessable Entity <br />
+    **Content:** `{"code":"Invalid Request","message":"A(n) application template already exists with name: New Application Template. Please update and try again.","fieldErrors":null}`
+
+  * **Code:** 429 Too Many Requests <br />
+    **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
+
+* **Sample Call:**
+
+```bash
+curl -H "Authorization: Bearer [YOUR TOKEN]" \
+     -H "Content-Type: application/json" \
+     -X POST https://manage.cloudistics.com/api/latest/templates/import-vm \
+     -d '{"name":"New Template","description":"Template imported from VM","cpu":4,"memory":1073741824,"operatingSystem":{"type":"CentOS Linux","version":"7"},"runSysPrep":true,"virtioDriversInstalled":true,"templateDiskFiles":[{"name":"disk2","path":"/path/to/disk2.vmdk"},{"name":"disk1","path":"/path/to/disk1.vmdk"}],"sharedStorage":{"type":"CIFS","hostname":"Hostname","shareName":"Share Name","username":"user","password":"password","domain":"Domain"}}'
+```
+
+* **Notes:**
+
+  * All fields are required except the description.
+  * Regarding the shared storage:
+    * The type must be either "NFS" or "CIFS".
+    * Only the hostname and share name are required within the shared storage.
+  * Regarding the template disk files:
+    * Their index in the array will specify its boot order. Its boot order value will be its index + 1.
+    * The template disk files must specify a supported file extension (vmdk, vhd, vhdx, ova, img, raw, vdi, qed or qcow2).
+  * A template vNIC will be created automatically and there is no need for it to be included in the request data. The template vNIC's boot order will be the number of disks + 1. For example, if there are two disks the template vNIC's boot order will be 3.
 
 
 ### Get Action Information
@@ -5816,13 +6012,7 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
     "timestamp": "2016-11-15'T'12:00:00",
     "category": "Networking",
     "notification": "SDN router renamed",
-    "description": "SDN router %old_router_name% has been renamed as %new_router_name% by user %issuer_user_name%. This request originated from IP address %issuer_ip_address%.",
-    "metadata": {
-      "old_router_name": "Old Router Name",
-      "new_router_name": "New Router Name",
-      "issuer_name": "Michael Nachmias",
-      "issuer_ip_address": "127.0.0.1"
-    }
+    "description": "SDN router Old Router Name has been renamed as New Router Name by user Michael Nachmias. This request originated from IP address 127.0.0.1."
   }
 ]
 ```
@@ -5896,6 +6086,636 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 ```bash
 curl -H "Authorization: Bearer [YOUR TOKEN]" \
      -G https://manage.cloudistics.com/api/latest/version
+```
+
+* **Notes:**
+
+  None
+
+
+### List all Locations
+  Returns json data about locations within an organization.
+
+* **URL**
+
+  `/api/latest/locations`
+
+* **Method:**
+
+  `GET`
+
+* **URL Params**
+
+  None
+
+* **Data Params**
+
+  None
+
+* **Success Response:**
+
+  * **Code:** 200 OK<br />
+    **Content:**
+```json
+[
+  {
+    "uuid": "fc06d214-31e5-4ee1-987e-b1adcd6c13dc",
+    "name": "Reston"
+  }
+]
+```
+
+* **Error Response:**
+
+  * **Code:** 400 Bad Request <br />
+    **Content:** `{"code":"Bad Request","message":"Invalid request parameter for REST API. Limit count must be a positive integer.","fieldErrors":null}`
+
+  * **Code:** 403 Forbidden <br />
+    **Content:** `{"code":"Access Denied","message":"Unable to access REST API. Invalid token.","fieldErrors":null}`
+
+  * **Code:** 429 Too Many Requests <br />
+    **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
+
+* **Sample Call:**
+
+```bash
+curl -H "Authorization: Bearer [YOUR TOKEN]" \
+     -G https://manage.cloudistics.com/api/latest/locations
+```
+
+* **Notes:**
+
+  None
+
+### Get Location Information
+  Returns json data about a location.
+
+* **URL**
+
+  `/api/latest/locations/[LOCATION UUID]`
+
+* **Method:**
+
+  `GET`
+
+* **URL Params**
+
+  None
+
+* **Data Params**
+
+  None
+
+* **Success Response:**
+
+  * **Code:** 200 OK<br />
+    **Content:**
+```json
+{
+  "uuid": "fc06d214-31e5-4ee1-987e-b1adcd6c13dc",
+  "name": "Reston"
+}
+```
+
+* **Error Response:**
+
+  * **Code:** 403 Forbidden <br />
+    **Content:** `{"code":"Access Denied","message":"Unable to access REST API. Invalid token.","fieldErrors":null}`
+
+  * **Code:** 404 Not Found <br />
+    **Content:** `{"code":"Resource Not Found","message":"Location with uuid fc06d214-31e5-4ee1-987e-b1adcd6c13dc does not exist.","fieldErrors":null}`
+
+  * **Code:** 429 Too Many Requests <br />
+    **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
+
+* **Sample Call:**
+
+```bash
+curl -H "Authorization: Bearer [YOUR TOKEN]" \
+     -G https://manage.cloudistics.com/api/latest/locations/[LOCATION UUID]
+```
+
+* **Notes:**
+
+  None
+
+### List all Compute Nodes
+  Returns json data about compute nodes within an organization.
+
+* **URL**
+
+  `/api/latest/compute-nodes`
+
+* **Method:**
+
+  `GET`
+
+* **URL Params**
+
+  None
+
+* **Data Params**
+
+  None
+
+* **Success Response:**
+
+  * **Code:** 200 OK<br />
+    **Content:**
+```json
+[
+  {
+    "uuid": "2c8ba748-6f7f-11e5-9d70-feff819cdc9f",
+    "name": "AlphaCompute"
+  }
+]
+```
+
+* **Error Response:**
+
+  * **Code:** 400 Bad Request <br />
+    **Content:** `{"code":"Bad Request","message":"Invalid request parameter for REST API. Limit count must be a positive integer.","fieldErrors":null}`
+
+  * **Code:** 403 Forbidden <br />
+    **Content:** `{"code":"Access Denied","message":"Unable to access REST API. Invalid token.","fieldErrors":null}`
+
+  * **Code:** 429 Too Many Requests <br />
+    **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
+
+* **Sample Call:**
+
+```bash
+curl -H "Authorization: Bearer [YOUR TOKEN]" \
+     -G https://manage.cloudistics.com/api/latest/compute-nodes
+```
+
+* **Notes:**
+
+  None
+
+### Get Compute Node Information
+  Returns json data about a compute node.
+
+* **URL**
+
+  `/api/latest/compute-nodes/[COMPUTE NODE UUID]`
+
+* **Method:**
+
+  `GET`
+
+*  **URL Params**
+
+   None
+
+* **Data Params**
+
+  None
+
+* **Success Response:**
+
+  * **Code:** 200 OK<br />
+    **Content:**
+```json
+{
+  "uuid": "2c8ba748-6f7f-11e5-9d70-feff819cdc9f",
+  "name": "AlphaCompute",
+  "description": "once or twice",
+  "locationUuid": "fc06d214-31e5-4ee1-987e-b1adcd6c13dc",
+  "migrationZoneUuid": "21ed442c-be25-11e6-a4a6-cec0c932ce01",
+  "categoryUuid": "b9422b16-be26-11e6-a4a6-cec0c932ce01",
+  "tags": [
+    {
+      "uuid": "b94221d4-be26-11e6-a4a6-cec0c932ce01"
+    },
+    {
+      "uuid": "b9422954-be26-11e6-a4a6-cec0c932ce01"
+    }
+  ],
+  "cpus": 24,
+  "memory": 67645734912,
+  "computeOperatingSystem": "Cloudistics Spark Hypervisor",
+  "computeServiceVersion": "1.1.1",
+  "maintenanceModeEnabled": false
+}
+```
+
+* **Error Response:**
+
+  * **Code:** 403 Forbidden <br />
+    **Content:** `{"code":"Access Denied","message":"Unable to access REST API. Invalid token.","fieldErrors":null}`
+
+  * **Code:** 404 Not Found <br />
+    **Content:** `{"code":"Resource Not Found","message":"Compute Node with uuid 2c8ba748-6f7f-11e5-9d70-feff819cdc9f does not exist.","fieldErrors":null}`
+
+  * **Code:** 429 Too Many Requests <br />
+    **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
+
+* **Sample Call:**
+
+```bash
+curl -H "Authorization: Bearer [YOUR TOKEN]" \
+     -G https://manage.cloudistics.com/api/latest/compute-nodes/[COMPUTE NODE UUID]
+```
+
+* **Notes:**
+
+  None
+
+### Get Compute Node Statistics
+  Returns json data about the statistics for a compute node.
+
+* **URL**
+
+  `/api/latest/compute-nodes/[COMPUTE NODE UUID]/stats`
+
+* **Method:**
+
+  `GET`
+
+*  **URL Params**
+
+   **Optional:**
+
+   `start-timestamp=[date with pattern "yyyy-MM-dd'T'HH:mm:ss"]`
+
+   `end-timestamp=[date with pattern "yyyy-MM-dd'T'HH:mm:ss"]`
+
+   `start-index=[positive integer]` *Defaults to 0*
+
+   `limit-count=[positive integer]` *Defaults to 1000*
+
+* **Data Params**
+
+  None
+
+* **Success Response:**
+
+  * **Code:** 200 OK<br />
+    **Content:**
+```json
+[
+  {
+    "timestamp": "2017-01-11'T'12:00:00",
+    "cpuUtilization": 50,
+    "memoryUtilization": 1073741824,
+    "networkBandwidthReadBytesPerSecond": 100,
+    "networkBandwidthWriteBytesPerSecond": 80
+  }
+]
+```
+
+* **Error Response:**
+
+  * **Code:** 400 Bad Request <br />
+    **Content:** `{"code":"Bad Request","message":"Invalid request parameter for REST API. Limit count must be a positive integer.","fieldErrors":null}`
+
+  * **Code:** 403 Forbidden <br />
+    **Content:** `{"code":"Access Denied","message":"Unable to access REST API. Invalid token.","fieldErrors":null}`
+
+  * **Code:** 404 Not Found <br />
+    **Content:** `{"code":"Resource Not Found","message":"Compute Node with uuid 2c8ba748-6f7f-11e5-9d70-feff819cdc9f does not exist.","fieldErrors":null}`
+
+  * **Code:** 429 Too Many Requests <br />
+    **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
+
+* **Sample Call:**
+
+```bash
+curl -H "Authorization: Bearer [YOUR TOKEN]" \
+     -G https://manage.cloudistics.com/api/latest/compute-nodes/[COMPUTE NODE UUID]/stats \
+     -d 'start-timestamp=2017-01-11T12:00:00'
+```
+
+* **Notes:**
+
+  None
+  
+
+### List all Storage Blocks
+  Returns json data about storage blocks within an organization.
+
+* **URL**
+
+  `/api/latest/storage-blocks`
+
+* **Method:**
+
+  `GET`
+
+* **URL Params**
+
+  None
+
+* **Data Params**
+
+  None
+
+* **Success Response:**
+
+  * **Code:** 200 OK<br />
+    **Content:**
+```json
+[
+  {
+    "uuid": "2c8ba61c-5f7c-11e5-9d70-feff819cdc9f",
+    "name": "Storage Unit 1"
+  }
+]
+```
+
+* **Error Response:**
+
+  * **Code:** 400 Bad Request <br />
+    **Content:** `{"code":"Bad Request","message":"Invalid request parameter for REST API. Limit count must be a positive integer.","fieldErrors":null}`
+
+  * **Code:** 403 Forbidden <br />
+    **Content:** `{"code":"Access Denied","message":"Unable to access REST API. Invalid token.","fieldErrors":null}`
+
+  * **Code:** 429 Too Many Requests <br />
+    **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
+
+* **Sample Call:**
+
+```bash
+curl -H "Authorization: Bearer [YOUR TOKEN]" \
+     -G https://manage.cloudistics.com/api/latest/storage-blocks
+```
+
+* **Notes:**
+
+  None
+
+### Get Storage Block Information
+  Returns json data about a storage block.
+
+* **URL**
+
+  `/api/latest/storage-blocks/[STORAGE BLOCK UUID]`
+
+* **Method:**
+
+  `GET`
+
+*  **URL Params**
+
+   None
+
+* **Data Params**
+
+  None
+
+* **Success Response:**
+
+  * **Code:** 200 OK<br />
+    **Content:**
+```json
+{
+  "uuid": "2c8ba61c-5f7c-11e5-9d70-feff819cdc9f",
+  "name": "Storage Unit 1",
+  "locationUuid": "fc06d214-31e5-4ee1-987e-b1adcd6c13dc",
+  "storagePoolUuid": "689baf34-71c9-11e6-9d70-feff819cdc9f"
+}
+```
+
+* **Error Response:**
+
+  * **Code:** 403 Forbidden <br />
+    **Content:** `{"code":"Access Denied","message":"Unable to access REST API. Invalid token.","fieldErrors":null}`
+
+  * **Code:** 404 Not Found <br />
+    **Content:** `{"code":"Resource Not Found","message":"Storage Block with uuid 2c8ba61c-5f7c-11e5-9d70-feff819cdc9f does not exist.","fieldErrors":null}`
+
+  * **Code:** 429 Too Many Requests <br />
+    **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
+
+* **Sample Call:**
+
+```bash
+curl -H "Authorization: Bearer [YOUR TOKEN]" \
+     -G https://manage.cloudistics.com/api/latest/storage-blocks/[STORAGE BLOCK UUID]
+```
+
+* **Notes:**
+
+  None
+
+### List all Storage Controllers
+  Returns json data about storage controllers within an organization.
+
+* **URL**
+
+  `/api/latest/storage-controllers`
+
+* **Method:**
+
+  `GET`
+
+* **URL Params**
+
+  None
+
+* **Data Params**
+
+  None
+
+* **Success Response:**
+
+  * **Code:** 200 OK<br />
+    **Content:**
+```json
+[
+  {
+    "uuid": "2c8ba61c-6f7f-11e5-9d70-feff819cdc9f",
+    "name": "Controller 1"
+  }
+]
+```
+
+* **Error Response:**
+
+  * **Code:** 400 Bad Request <br />
+    **Content:** `{"code":"Bad Request","message":"Invalid request parameter for REST API. Limit count must be a positive integer.","fieldErrors":null}`
+
+  * **Code:** 403 Forbidden <br />
+    **Content:** `{"code":"Access Denied","message":"Unable to access REST API. Invalid token.","fieldErrors":null}`
+
+  * **Code:** 429 Too Many Requests <br />
+    **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
+
+* **Sample Call:**
+
+```bash
+curl -H "Authorization: Bearer [YOUR TOKEN]" \
+     -G https://manage.cloudistics.com/api/latest/storage-controllers
+```
+
+* **Notes:**
+
+  None
+
+### Get Storage Controller Information
+  Returns json data about a storage controller.
+
+* **URL**
+
+  `/api/latest/storage-controllers/[STORAGE CONTROLLER UUID]`
+
+* **Method:**
+
+  `GET`
+
+*  **URL Params**
+
+   None
+
+* **Data Params**
+
+  None
+
+* **Success Response:**
+
+  * **Code:** 200 OK<br />
+    **Content:**
+```json
+{
+  "uuid": "2c8ba61c-6f7f-11e5-9d70-feff819cdc9f",
+  "name": "Controller 1",
+  "locationUuid": "fc06d214-31e5-4ee1-987e-b1adcd6c13dc",
+  "storageBlockUuid": "2c8ba61c-5f7c-11e5-9d70-feff819cdc9f",
+  "active": true,
+  "computeOperatingSystem": "Cloudistics Spark Hypervisor",
+  "computeServiceVersion": "1.1.1"
+}
+```
+
+* **Error Response:**
+
+  * **Code:** 403 Forbidden <br />
+    **Content:** `{"code":"Access Denied","message":"Unable to access REST API. Invalid token.","fieldErrors":null}`
+
+  * **Code:** 404 Not Found <br />
+    **Content:** `{"code":"Resource Not Found","message":"Storage Controller with uuid 2c8ba61c-6f7f-11e5-9d70-feff819cdc9f does not exist.","fieldErrors":null}`
+
+  * **Code:** 429 Too Many Requests <br />
+    **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
+
+* **Sample Call:**
+
+```bash
+curl -H "Authorization: Bearer [YOUR TOKEN]" \
+     -G https://manage.cloudistics.com/api/latest/storage-controllers/[STORAGE CONTROLLER UUID]
+```
+
+* **Notes:**
+
+  None
+
+
+### List all Allocations
+  Returns json data about allocations within an organization.
+
+* **URL**
+
+  `/api/latest/allocations`
+
+* **Method:**
+
+  `GET`
+
+* **URL Params**
+
+  None
+
+* **Data Params**
+
+  None
+
+* **Success Response:**
+
+  * **Code:** 200 OK<br />
+    **Content:**
+```json
+{
+  "datacenters": [
+    {
+      "uuid": "21ed4350-be25-11e6-a4a6-cec0c932ce01",
+      "name": "Datacenter 1",
+      "migrationZones": [
+        {
+          "uuid": "21ed442c-be25-11e6-a4a6-cec0c932ce01",
+          "name": "DevOpsMigrationZone",
+          "categories": {
+            "uuid": "b9422b16-be26-11e6-a4a6-cec0c932ce01",
+            "name": "Default",
+            "cpus": 2,
+            "memory": 2147483648
+          }
+        },
+        {
+          "uuid": "21ed4530-be25-11e6-a4a6-cec0c932ce01",
+          "name": "QaMigrationZone",
+          "categories": {
+            "uuid": "284f2702-be27-11e6-a4a6-cec0c932ce01",
+            "name": "Cucamonga",
+            "cpus": 2,
+            "memory": 2147483648
+          }
+        }
+      ],
+      "storagePools": [
+        {
+          "uuid": "689baf34-71c9-11e6-9d70-feff819cdc9f",
+          "name": "Flash Pool 1",
+          "connectedMigrationZones": [
+            {
+              "uuid": "21ed442c-be25-11e6-a4a6-cec0c932ce01",
+              "name": "DevOpsMigrationZone"
+            },
+            {
+              "uuid": "21ed4530-be25-11e6-a4a6-cec0c932ce01",
+              "name": "QaMigrationZone"
+            }
+          ],
+          "storageBytes": 107374182400
+        },
+        {
+          "uuid": "689baf34-71c9-11e6-9d70-feff819cdc8f",
+          "name": "Flash Pool 2",
+          "connectedMigrationZones": [
+            {
+              "uuid": "21ed442c-be25-11e6-a4a6-cec0c932ce01",
+              "name": "DevOpsMigrationZone"
+            },
+            {
+              "uuid": "21ed4530-be25-11e6-a4a6-cec0c932ce01",
+              "name": "QaMigrationZone"
+            }
+          ],
+          "storageBytes": 107374182400
+        }
+      ]
+    }
+  ]
+}
+```
+
+* **Error Response:**
+
+  * **Code:** 400 Bad Request <br />
+    **Content:** `{"code":"Bad Request","message":"Invalid request parameter for REST API. Limit count must be a positive integer.","fieldErrors":null}`
+
+  * **Code:** 403 Forbidden <br />
+    **Content:** `{"code":"Access Denied","message":"Unable to access REST API. Invalid token.","fieldErrors":null}`
+
+  * **Code:** 429 Too Many Requests <br />
+    **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
+
+* **Sample Call:**
+
+```bash
+curl -H "Authorization: Bearer [YOUR TOKEN]" \
+     -G https://manage.cloudistics.com/api/latest/allocations
 ```
 
 * **Notes:**
