@@ -125,8 +125,7 @@ The topic for each action shows the Query API request parameters and the JSON re
 * [Create VNET](#create-vnet)
 * [Create VLAN](#create-vlan)
 * [Rename Network](#rename-network)
-* [Edit VNET Properties](#edit-vnet-properties)
-* [Edit VNET DHCP Service](#edit-vnet-dhcp-service)
+* [Edit VNET Properties and DHCP](#edit-vnet-properties-and-dhcp)
 * [Edit VNET Routing Service](#edit-vnet-routing-service)
 * [Edit VNET Firewall Profile](#edit-vnet-firewall-profile)
 * [Deploy NFV Instance to VNET](#deploy-nfv-instance-to-vnet)
@@ -156,6 +155,7 @@ The topic for each action shows the Query API request parameters and the JSON re
 * [List all Storage Controllers](#list-all-storage-controllers)
 * [Get Storage Controller Information](#get-storage-controller-information)
 * [List all Allocations](#list-all-allocations)
+* [Get Operating System Versions](#get-operating-system-versions)
 
 ### List all Applications
 Returns json data about applications within an organization.
@@ -1798,7 +1798,8 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 ```json
 {
   "actionUuid": "71011d4e-a4f7-4ab1-95e0-9e8986fb3f2c",
-  "objectUuid": "[APPLICATION UUID]"
+  "objectUuid": "[APPLICATION UUID]",
+  "message": "Application compute tags successfully updated."
 }
 ```
 
@@ -4643,7 +4644,7 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 
 * **URL**
 
-  `/api/latest/vnets/[VNET UUID]/properties`
+  `/api/latest/vnets/[VNET UUID]/properties-and-dhcp`
 
 * **Method:**
 
@@ -4659,7 +4660,22 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 {
   "networkAddress": "3.3.3.3",
   "subnetMask": "255.255.255.0",
-  "defaultGateway": "3.3.3.4"
+  "defaultGateway": "3.3.3.4",
+  "dhcpService" : {
+     "startIpRange":"3.3.3.33",
+     "endIpRange":"3.3.3.40",
+     "leaseTime":86400,
+     "domainName":"Domain Name",
+     "primaryDnsServerIpAddress":"6.6.6.6",
+     "secondaryDnsServerIpAddress":"7.7.7.7",
+     "staticBindings":[
+        {
+           "hostname":"Host Name",
+           "macAddress":"08:62:66:2b:88:b3",
+           "ipAddress":"127.0.0.1"
+        }
+     ]
+    }
 }
 ```
 
@@ -4669,7 +4685,7 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
     **Content:**
 ```json
 {
-  "message": "VNET properties updated successfully."
+  "message": "VNET properties and dhcp updated successfully."
 }
 ```
     
@@ -4704,7 +4720,7 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 ```bash
 curl -H "Authorization: Bearer [YOUR TOKEN]" \
      -H "Content-Type: application/json" \
-     -X PUT https://manage.cloudistics.com/api/latest/vnets/[VNET UUID]/properties \
+     -X PUT https://manage.cloudistics.com/api/latest/vnets/[VNET UUID]/properties-and-dhcp \
      -d '{"networkAddress":"3.3.3.3","subnetMask":"255.255.255.0","defaultGateway":"3.3.3.4"}'
 ```
 
@@ -4713,94 +4729,6 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
   * This action can be performed on both automatically deployed and manually linked VNETs.
   * The request will fail if the IP range calculated using the network address and subnet mask does conflict with any other VNETs and network switches in the organization.
   * The response will only include the action information if the VNET is complete and the NFV instance is not shut off. Otherwise it will return a 200 OK response status that the changes were persisted to the database. For automatically deployed VNETs, when the subnet is changed, the dhcp range will be updated accordingly.
-
-
-### Edit VNET DHCP Service
-  Edits a VNET's DHCP service and returns json data about the action.
-
-* **URL**
-
-  `/api/latest/vnets/[VNET UUID]/dhcp-service`
-
-* **Method:**
-
-  `PUT`
-
-*  **URL Params**
-
-  None
-
-* **Data Params**
-
-```json
-{
-   "startIpRange":"3.3.3.33",
-   "endIpRange":"3.3.3.40",
-   "leaseTime":86400,
-   "domainName":"Domain Name",
-   "primaryDnsServerIpAddress":"6.6.6.6",
-   "secondaryDnsServerIpAddress":"7.7.7.7",
-   "staticBindings":[
-      {
-         "hostname":"Host Name",
-         "macAddress":"08:62:66:2b:88:b3",
-         "ipAddress":"127.0.0.1"
-      }
-   ]
-}
-```
-
-* **Success Response:**
-
-  * **Code:** 200 OK<br />
-    **Content:**
-```json
-{
-  "message": "VNET DHCP service updated successfully."
-}
-```
-    
-  * **Code:** 202 Accepted <br />
-    **Content:**
-```json
-{
-  "actionUuid": "71011d4e-a4f7-4ab1-95e0-9e8986fb3f2c",
-  "objectUuid": "[VNET UUID]"
-}
-```
-
-* **Error Response:**
-
-  * **Code:** 400 Bad Request <br />
-    **Content:** `{"code":"Bad Request: Invalid request data","message":"field: [name] error: [required field is empty or not provided]","fieldErrors":null}`
-
-  * **Code:** 403 Forbidden <br />
-    **Content:** `{"code":"Access Denied","message":"Unable to access REST API. Invalid token.","fieldErrors":null}`
-
-  * **Code:** 404 Not Found <br />
-    **Content:** `{"code":"Resource Not Found","message":"VNET with uuid 3625edfa-1d41-488c-bbdc-13d35bdeb9ae does not exist.","fieldErrors":null}`
-
-  * **Code:** 422 Unprocessable Entity <br />
-    **Content:** `{"code":"Invalid Request","message":"Error editing DHCP service for vnet. The DHCP start IP range does not fall within the usable IP range of the vnet.","fieldErrors":null}`
-
-  * **Code:** 429 Too Many Requests <br />
-    **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
-
-* **Sample Call:**
-
-```bash
-curl -H "Authorization: Bearer [YOUR TOKEN]" \
-     -H "Content-Type: application/json" \
-     -X PUT https://manage.cloudistics.com/api/latest/vnets/[VNET UUID]/dhcp-service \
-     -d '{"startIpRange":"3.3.3.33","endIpRange":"3.3.3.40","leaseTime":86400,"domainName":"Domain Name","primaryDnsServerIpAddress":"6.6.6.6","secondaryDnsServerIpAddress":"7.7.7.7","staticBindings":[{"hostname":"Host Name","macAddress":"08:62:66:2b:88:b3","ipAddress":"127.0.0.1"}]}'
-```
-
-* **Notes:**
-
-  * This action can only be performed on automatically deployed VNETs.
-  * The start IP range and end IP range are required. All other fields are optional.
-  * The response will only include the action information if the VNET is complete and the NFV instance is not shut off. Otherwise it will return a 200 OK response status that the changes were persisted to the database.
-
 
 ### Edit VNET Routing Service
   Edits a VNET's routing service and returns json data about the action.
@@ -5851,8 +5779,8 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
    "cpu":4,
    "memory":1073741824,
    "operatingSystem":{
-      "type":"CentOS Linux",
-      "version":"7"
+      "type":"Linux",
+      "version":"Enterprise Linux 6/7"
    },
    "runSysPrep":true,
    "virtioDriversInstalled":true,
@@ -5908,7 +5836,7 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 curl -H "Authorization: Bearer [YOUR TOKEN]" \
      -H "Content-Type: application/json" \
      -X POST https://manage.cloudistics.com/api/latest/templates/import-vm \
-     -d '{"name":"New Template","description":"Template imported from VM","cpu":4,"memory":1073741824,"operatingSystem":{"type":"CentOS Linux","version":"7"},"runSysPrep":true,"virtioDriversInstalled":true,"templateDiskFiles":[{"name":"disk2","path":"/path/to/disk2.vmdk"},{"name":"disk1","path":"/path/to/disk1.vmdk"}],"sharedStorage":{"type":"CIFS","hostname":"Hostname","shareName":"Share Name","username":"user","password":"password","domain":"Domain"}}'
+     -d '{"name":"New Template","description":"Template imported from VM","cpu":4,"memory":1073741824,"operatingSystem":{"type":"Linux","version":"Enterprise Linux 6/7"},"runSysPrep":true,"virtioDriversInstalled":true,"templateDiskFiles":[{"name":"disk2","path":"/path/to/disk2.vmdk"},{"name":"disk1","path":"/path/to/disk1.vmdk"}],"sharedStorage":{"type":"CIFS","hostname":"Hostname","shareName":"Share Name","username":"user","password":"password","domain":"Domain"}}'
 ```
 
 * **Notes:**
@@ -5921,6 +5849,7 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
     * Their index in the array will specify its boot order. Its boot order value will be its index + 1.
     * The template disk files must specify a supported file extension (vmdk, vhd, vhdx, ova, img, raw, vdi, qed or qcow2).
   * A template vNIC will be created automatically and there is no need for it to be included in the request data. The template vNIC's boot order will be the number of disks + 1. For example, if there are two disks the template vNIC's boot order will be 3.
+  * Please use the operating system version endpoint and determine which operating system type and version are appropriate for the VM that is being imported to a template. 
 
 
 ### Get Action Information
@@ -6285,6 +6214,7 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
   "migrationZoneUuid": "21ed442c-be25-11e6-a4a6-cec0c932ce01",
   "categoryUuid": "b9422b16-be26-11e6-a4a6-cec0c932ce01",
   "tags": [
+  "tags": [
     {
       "uuid": "b94221d4-be26-11e6-a4a6-cec0c932ce01"
     },
@@ -6611,7 +6541,6 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 
   None
 
-
 ### List all Allocations
   Returns json data about allocations within an organization.
 
@@ -6716,6 +6645,82 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 ```bash
 curl -H "Authorization: Bearer [YOUR TOKEN]" \
      -G https://manage.cloudistics.com/api/latest/allocations
+```
+
+* **Notes:**
+
+  None
+
+### Get Operating System Versions
+  Returns json data about operating system versions.
+
+* **URL**
+
+  `/api/latest/operating-system-versions`
+
+* **Method:**
+
+  `GET`
+
+* **URL Params**
+
+  None
+
+* **Data Params**
+
+  None
+
+* **Success Response:**
+
+  * **Code:** 200 OK<br />
+    **Content:**
+```json
+{
+   "osTypes":[
+      "Linux",
+      "Windows",
+      "Other",
+      "BSD"
+   ],
+   "osVersionsByOsType":{
+      "BSD":[
+         "FreeBSD 10.3"
+      ],
+      "Linux":[
+         "Enterprise Linux 6/7",
+         "Ubuntu 16.04"
+      ],
+      "Windows":[
+         "Windows 7",
+         "Windows 8",
+         "Windows 8.1",
+         "Windows 10",
+         "Windows Server 2008R2",
+         "Windows Server 2012",
+         "Windows Server 2012R2",
+         "Windows Server 2016"
+      ],
+      "Other":[
+         "FreeNAS 9.10",
+         "NetScaler"
+      ]
+   }
+}
+```
+
+* **Error Response:**
+
+  * **Code:** 403 Forbidden <br />
+    **Content:** `{"code":"Access Denied","message":"Unable to access REST API. Invalid token.","fieldErrors":null}`
+
+  * **Code:** 429 Too Many Requests <br />
+    **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
+
+* **Sample Call:**
+
+```bash
+curl -H "Authorization: Bearer [YOUR TOKEN]" \
+     -G https://manage.cloudistics.com/api/latest/operating-system-versions
 ```
 
 * **Notes:**
