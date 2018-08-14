@@ -1,4 +1,4 @@
-# Cloudistics Web Services (CWS)
+# Cloudistics Web Services (CWS) (Alpha)
 
 Cloudistics web services provides API access to the Cloudistics on-premises cloud platform. It provides access to virtual datacenter and infrastructure resources and is used to create resizable resources, manage workloads and retrieve information about the underlying infrastructure. CWS will continue to grow as new capabilities are added to the platform.
 
@@ -69,6 +69,7 @@ The topic for each action shows the Query API request parameters and the JSON re
 * [Start Application](#start-application)
 * [Stop Application](#stop-application)
 * [Restart Application](#restart-application)
+* [Force restart Application](#force-restart-application)
 * [Suspend Application](#suspend-application)
 * [Resume Application](#resume-application)
 * [Delete Application](#delete-application)
@@ -608,6 +609,9 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 
 * **Data Params**
 
+  **Optional:**
+  `guestAgentToolsAvailable=true`
+
 ```json
 {
   "name": "CentOS 7.5 Application",
@@ -654,7 +658,9 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
   ],
   "hardwareAssistedVirtualizationEnabled": true,
   "vmMode": "Enhanced",
-  "applicationGroupUuid":"0ec8fee4-133b-46e5-b892-4ddd7ff62ab3"
+  "applicationGroupUuid":"0ec8fee4-133b-46e5-b892-4ddd7ff62ab3",
+  "autostart": true,
+  "guestAgentToolsAvailable": true
 }
 ```
 
@@ -692,12 +698,12 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 curl -H "Authorization: Bearer [YOUR TOKEN]" \
      -H "Content-Type: application/json" \
      -X POST https://manage.cloudistics.com/api/latest/applications \
-     -d '{"name":"CentOS 7.5 Application","description":"This application was created from a CentOS template.","vcpus":4,"memory":1073741824,"templateUuid":"3625edfa-1d41-488c-bbdc-13d35bdeb9ae","categoryUuid":"a55bb4da-7cad-40cb-95e0-37db93c7aa5e","tags":[{"uuid":"3402698b-d436-4b70-8fe7-d44fae37c68a"}],"datacenterUuid":"101552a2-e436-415a-a1cd-a11e5cb1e06e","migrationZoneUuid":"6c47337b-9ee0-434d-90a6-2743b1bcdf9a","flashPoolUuid":"d80fe07d-5858-4de8-98ce-8a8b9b6684a4","networks":[{"name":"vNIC 0","vnicUuid":"bf6199ea-a94b-4768-b24d-8994bf9bdf88","type":"VNET","networkUuid":"ff724194-931c-4c02-928e-e37821e74a8a","firewallOverrideUuid":"1f6aa5ea-3e65-4767-a08f-fb454aa26afd","automaticMACAssignment":false,"macAddress":"ab:ab:ab:ab:ab:ab"}],"bootOrder":[{"diskUuid":"1b35fadb-7c63-46a6-9011-1df2a4f34918","name":"Disk 1","order":1},{"vnicUuid":"bf6199ea-a94b-4768-b24d-8994bf9bdf88","name":"vNIC 0","order":2},{"diskUuid":"694c1484-ced4-4810-bcb3-a302ffb45f12","name":"Disk 2","order":3}],"hardwareAssistedVirtualizationEnabled":true,"vmMode":"Enhanced","applicationGroupUuid":"0ec8fee4-133b-46e5-b892-4ddd7ff62ab3"}'
+     -d '{"name":"CentOS 7.5 Application","description":"This application was created from a CentOS template.","vcpus":4,"memory":1073741824,"templateUuid":"3625edfa-1d41-488c-bbdc-13d35bdeb9ae","categoryUuid":"a55bb4da-7cad-40cb-95e0-37db93c7aa5e","tags":[{"uuid":"3402698b-d436-4b70-8fe7-d44fae37c68a"}],"datacenterUuid":"101552a2-e436-415a-a1cd-a11e5cb1e06e","migrationZoneUuid":"6c47337b-9ee0-434d-90a6-2743b1bcdf9a","flashPoolUuid":"d80fe07d-5858-4de8-98ce-8a8b9b6684a4","networks":[{"name":"vNIC 0","vnicUuid":"bf6199ea-a94b-4768-b24d-8994bf9bdf88","type":"VNET","networkUuid":"ff724194-931c-4c02-928e-e37821e74a8a","firewallOverrideUuid":"1f6aa5ea-3e65-4767-a08f-fb454aa26afd","automaticMACAssignment":false,"macAddress":"ab:ab:ab:ab:ab:ab"}],"bootOrder":[{"diskUuid":"1b35fadb-7c63-46a6-9011-1df2a4f34918","name":"Disk 1","order":1},{"vnicUuid":"bf6199ea-a94b-4768-b24d-8994bf9bdf88","name":"vNIC 0","order":2},{"diskUuid":"694c1484-ced4-4810-bcb3-a302ffb45f12","name":"Disk 2","order":3}],"hardwareAssistedVirtualizationEnabled":true,"vmMode":"Enhanced","applicationGroupUuid":"0ec8fee4-133b-46e5-b892-4ddd7ff62ab3","autostart":true,"guestAgentToolsAvailable":true}'
 ```
 
 * **Notes:**
 
-  * Optional fields in the request are "description" and "tags".
+  * Optional fields in the request are "guestAgentToolsAvailable", "description" and "tags".
   * Networking "type" options are "VNET" or "VLAN". For both types, "networkUuid" is required and "firewallOverrideUuid" is optional. If "VLAN" networking is chosen, "firewallOverrideUuid" cannot be included.
   * The boot order should contain all existing template disk files and networks (vNICs) tied to the template. The following are failures that can happen with relation to the boot order:
     * If there is not at least one disk included in the boot order, the request will fail as at least one storage disk is required.
@@ -725,6 +731,9 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
   None
 
 * **Data Params**
+
+  **Optional:**
+  `guestAgentToolsAvailable=true`
 
 ```json
 {
@@ -772,7 +781,9 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
   ],
   "hardwareAssistedVirtualizationEnabled": true,
   "vmMode": "Enhanced",
-  "applicationGroupUuid":"0ec8fee4-133b-46e5-b892-4ddd7ff62ab3"
+  "applicationGroupUuid":"0ec8fee4-133b-46e5-b892-4ddd7ff62ab3",
+  "autostart": true,
+  "guestAgentToolsAvailable": true
 }
 ```
 
@@ -810,12 +821,12 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 curl -H "Authorization: Bearer [YOUR TOKEN]" \
      -H "Content-Type: application/json" \
      -X POST https://manage.cloudistics.com/api/latest/applications/create-from-snapshot \
-     -d '{"name":"CentOS 7.5 Application Snapshot","description":"This application was created from a CentOS 7.5 Application snapshot.","vcpus":4,"memory":1073741824,"snapshotUuid":"3625edfa-1d41-488c-bbdc-13d35bdeb9ae","categoryUuid":"a55bb4da-7cad-40cb-95e0-37db93c7aa5e","tags":[{"uuid":"3402698b-d436-4b70-8fe7-d44fae37c68a"}],"datacenterUuid":"101552a2-e436-415a-a1cd-a11e5cb1e06e","migrationZoneUuid":"6c47337b-9ee0-434d-90a6-2743b1bcdf9a","flashPoolUuid":"d80fe07d-5858-4de8-98ce-8a8b9b6684a4","networks":[{"name":"vNIC 0","vnicUuid":"bf6199ea-a94b-4768-b24d-8994bf9bdf88","type":"VNET","networkUuid":"ff724194-931c-4c02-928e-e37821e74a8a","firewallOverrideUuid":"1f6aa5ea-3e65-4767-a08f-fb454aa26afd","automaticMACAssignment":false,"macAddress":"ab:ab:ab:ab:ab:ab"}],"bootOrder":[{"diskUuid":"1b35fadb-7c63-46a6-9011-1df2a4f34918","name":"Disk 1","order":1},{"vnicUuid":"bf6199ea-a94b-4768-b24d-8994bf9bdf88","name":"vNIC 0","order":2},{"diskUuid":"694c1484-ced4-4810-bcb3-a302ffb45f12","name":"Disk 2","order":3}],"hardwareAssistedVirtualizationEnabled":true,"vmMode":"Enhanced","applicationGroupUuid":"0ec8fee4-133b-46e5-b892-4ddd7ff62ab3"}'
+     -d '{"name":"CentOS 7.5 Application Snapshot","description":"This application was created from a CentOS 7.5 Application snapshot.","vcpus":4,"memory":1073741824,"snapshotUuid":"3625edfa-1d41-488c-bbdc-13d35bdeb9ae","categoryUuid":"a55bb4da-7cad-40cb-95e0-37db93c7aa5e","tags":[{"uuid":"3402698b-d436-4b70-8fe7-d44fae37c68a"}],"datacenterUuid":"101552a2-e436-415a-a1cd-a11e5cb1e06e","migrationZoneUuid":"6c47337b-9ee0-434d-90a6-2743b1bcdf9a","flashPoolUuid":"d80fe07d-5858-4de8-98ce-8a8b9b6684a4","networks":[{"name":"vNIC 0","vnicUuid":"bf6199ea-a94b-4768-b24d-8994bf9bdf88","type":"VNET","networkUuid":"ff724194-931c-4c02-928e-e37821e74a8a","firewallOverrideUuid":"1f6aa5ea-3e65-4767-a08f-fb454aa26afd","automaticMACAssignment":false,"macAddress":"ab:ab:ab:ab:ab:ab"}],"bootOrder":[{"diskUuid":"1b35fadb-7c63-46a6-9011-1df2a4f34918","name":"Disk 1","order":1},{"vnicUuid":"bf6199ea-a94b-4768-b24d-8994bf9bdf88","name":"vNIC 0","order":2},{"diskUuid":"694c1484-ced4-4810-bcb3-a302ffb45f12","name":"Disk 2","order":3}],"hardwareAssistedVirtualizationEnabled":true,"vmMode":"Enhanced","applicationGroupUuid":"0ec8fee4-133b-46e5-b892-4ddd7ff62ab3","autostart":true,"guestAgentToolsAvailable":true}'
 ```
 
 * **Notes:**
 
-  * Optional fields in the request are "description" and "tags".
+  * Optional fields in the request are "guestAgentToolsAvailable", "description" and "tags".
   * Networking "type" options are "VNET" or "VLAN". For both types, "networkUuid" is required and "firewallOverrideUuid" is optional. If "VLAN" networking is chosen, "firewallOverrideUuid" cannot be included.
   * The boot order should contain all existing disks and networks (vNICs) tied to the application of the snapshot. The following are failures that can happen with relation to the boot order:
     * If there is not at least one disk included in the boot order, the request will fail as at least one storage disk is required.
@@ -994,6 +1005,61 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 
   None
 
+### Force restart Application
+  Force restarts an application and returns json data about the action.
+
+* **URL**
+
+  `/api/latest/applications/[APPLICATION UUID]/force-restart`
+
+* **Method:**
+
+  `PUT`
+
+* **URL Params**
+
+  None
+
+* **Data Params**
+
+  None
+
+* **Success Response:**
+
+  * **Code:** 202 Accepted <br />
+    **Content:**
+```json
+{
+  "actionUuid": "71011d4e-a4f7-4ab1-95e0-9e8986fb3f2c",
+  "objectUuid": "[APPLICATION UUID]"
+}
+```
+
+* **Error Response:**
+
+  * **Code:** 403 Forbidden <br />
+    **Content:** `{"code":"Access Denied","message":"Unable to access REST API. Invalid token.","fieldErrors":null}`
+
+  * **Code:** 404 Not Found <br />
+    **Content:** `{"code":"Resource Not Found","message":"Application with uuid e696855c-186f-4c2a-a381-1637195bef3f does not exist.","fieldErrors":null}`
+
+  * **Code:** 422 Unprocessable Entity <br />
+    **Content:** `{"code":"Invalid Request","message":"Unable to force restart application that is not running.","fieldErrors":null}`
+
+  * **Code:** 429 Too Many Requests <br />
+    **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
+
+* **Sample Call:**
+
+```bash
+curl -H "Authorization: Bearer [YOUR TOKEN]" \
+     -X PUT https://manage.cloudistics.com/api/latest/applications/[APPLICATION UUID]/force-restart
+```
+
+* **Notes:**
+
+  None
+  
 
 ### Suspend Application
   Suspends an application and returns json data about the action.
@@ -1434,9 +1500,13 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
    None
 
 * **Data Params**
+  **Optional:**
+
+  `name=[new application name]` *Using current application name by default*
 
 ```json
 {
+  "name": "newAppName",
   "datacenterUuid": "20209870-b4f0-11e7-abc4-cec278b6b50a"
 }
 ```
@@ -1462,6 +1532,9 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
   * **Code:** 422 Unprocessable Entity <br />
     **Content:** `{"code":"Invalid Request","message":"Unable to update application instance datacenter. Application must be shut off to complete this action.","fieldErrors":null}`
 
+  * **Code:** 422 Unprocessable Entity <br />
+    **Content:** `{"code":"Invalid Request","message":""A(n) application for this datacenter already exists with name: APPLICATION_NAME. Please update and try again.".","fieldErrors":null}`
+
   * **Code:** 429 Too Many Requests <br />
     **Content:** `{"code":"Too Many Requests","message":"Unable to access REST API. Rate limit exceeded.","fieldErrors":null}`
 
@@ -1471,11 +1544,12 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 curl -H "Authorization: Bearer [YOUR TOKEN]" \
      -H "Content-Type: application/json" \
      -X PUT https://manage.cloudistics.com/api/latest/applications/[APPLICATION UUID]/datacenter \
-     -d '{"datacenterUuid": "20209870-b4f0-11e7-abc4-cec278b6b50a"}'
+     -d '{"name": "New name", datacenterUuid": "20209870-b4f0-11e7-abc4-cec278b6b50a"}'
 ```
 
 * **Notes:**
 
+  * Field 'name' is optional. It is a new name for an Application in selected datacenter. If this field isn't set we use a current name for an application.
   * After a successful update, this application will no longer be assigned a migration zone, a category, or have any compute tags.
   
 
@@ -4262,7 +4336,6 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
       ]
    },
    "routingService":{
-      "type":"VNET",
       "networkUuid":"23fe4063-fdfd-4210-8a72-8494f99b4cea",
       "addressMode":"Static",
       "ipAddress":"4.4.4.4",
@@ -5629,6 +5702,9 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 
 * **Data Params**
 
+  **Optional:**
+  `datacenterUuid=[DATACENTER UUID]`
+  
 ```json
 {
   "name": "New Windows Template",
@@ -5650,7 +5726,8 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
       "name": "vNIC 0",
       "order": 2
     }
-  ]
+  ],
+  "datacenterUuid": "101552a2-e436-415a-a1cd-a11e5cb1e06e"
 }
 ```
 
@@ -5772,6 +5849,9 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 
 * **Data Params**
 
+  **Optional:**
+  `datacenterId=[positive integer]`
+
 ```json
 {
    "name":"New Template",
@@ -5801,7 +5881,8 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
       "username":"user",
       "password":"password",
       "domain":"Domain"
-   }
+   },
+   "datacenterUuid":"651429f1-a8e4-4830-afef-87c872ac78a2"
 }
 ```
 
@@ -5841,7 +5922,7 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
 
 * **Notes:**
 
-  * All fields are required except the description.
+  * All fields are required except the description, and datacenterUuid (see below).
   * Regarding the shared storage:
     * The type must be either "NFS" or "CIFS".
     * Only the hostname and share name are required within the shared storage.
@@ -5850,6 +5931,7 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
     * The template disk files must specify a supported file extension (vmdk, vhd, vhdx, ova, img, raw, vdi, qed or qcow2).
   * A template vNIC will be created automatically and there is no need for it to be included in the request data. The template vNIC's boot order will be the number of disks + 1. For example, if there are two disks the template vNIC's boot order will be 3.
   * Please use the operating system version endpoint and determine which operating system type and version are appropriate for the VM that is being imported to a template. 
+  * Datacenter uuid is optional for users with Infrastructure Admin role, required for users with VDC Manager role.
 
 
 ### Get Action Information
@@ -6213,7 +6295,6 @@ curl -H "Authorization: Bearer [YOUR TOKEN]" \
   "locationUuid": "fc06d214-31e5-4ee1-987e-b1adcd6c13dc",
   "migrationZoneUuid": "21ed442c-be25-11e6-a4a6-cec0c932ce01",
   "categoryUuid": "b9422b16-be26-11e6-a4a6-cec0c932ce01",
-  "tags": [
   "tags": [
     {
       "uuid": "b94221d4-be26-11e6-a4a6-cec0c932ce01"
